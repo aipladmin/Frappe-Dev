@@ -1,0 +1,56 @@
+{% extends 'index.html' %}
+{% block content %}
+<style>
+  .input {
+  padding-right: 0;  
+  padding-left: 0;
+}
+</style>
+
+ <!-- Page Heading -->
+  <div class="d-sm-flex align-items-center justify-content-between mb-4">
+    <h1 class="h3 mb-0 text-gray-800">Inventory</h1>
+  </div>
+
+{% include 'notifications.html' %}
+
+<div class="container-fluid">
+    <table class="table table-striped">
+  <thead>
+    <tr>
+      <th scope="col">Book ID</th>
+      <th scope="col">Title</th>
+      <th scope="col">Authors</th>
+      <th scope="col">ISBN</th>
+      <th scope="col">Publisher</th>
+      <th cope="col">Holdings</th>
+      <th cope="col">Update Inv.</th>
+    </tr>
+  </thead>
+  <tbody>
+    
+    {% for x in data %}
+    <form method="POST" action="{{ url_for('admin.inventory') }}">
+        <tr>
+            <td>{{ x.bookID }} </td>
+            <td>{{ x.title }} </td>
+            <td>{{ x.authors }}</td>
+            <td>{{ x.isbn }}</td>
+            <td>{{ x.publisher }}</td>
+            <td>{{ x.inventory.CInt }}</td>
+            <td>
+                <input type="text" class="form-control col-sm-6" name="inventory" />
+            </td>
+            <td>
+                <button type="submit" class="btn btn-success" name="IID" value="{{ x.BID }}">Update</button>
+            </td>
+        </tr>
+    </form>        
+    {% endfor %}
+
+    </tr>
+  </tbody>
+</table>
+</div>
+
+{% endblock %}
