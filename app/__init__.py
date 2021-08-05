@@ -1,7 +1,6 @@
 from flask import Flask
 from flaskext.mysql import MySQL
 import decimal
-import logging
 import flask.json
 from flask_sqlalchemy import SQLAlchemy
 from .config import Config

@@ -13,13 +13,13 @@ matplotlib.use('Agg')
 
 
 admin = Blueprint('admin', __name__, template_folder='templates', static_folder='static',
-                  static_url_path='/controller/static', url_prefix='/')
+                  static_url_path='/controller/static')
 
 
-@admin.before_request
-def before_request():
-    session.pop('email', '')
-    session.clear()
+# @admin.before_request
+# def before_request():
+#     session.pop('email', '')
+#     session.clear()
 
 
 @admin.route('/')
@@ -36,9 +36,9 @@ def books():
     return render_template('admin/books.html', title=title, authors=authors, publisher=publisher)
 
 
-@admin.route('/books/insert', methods=['POST'])
+@admin.route('/insert', methods=['POST'])
 def books_to_inv():
-    nof_books = request.form['nob'] 
+    nof_books = request.form['nob']
     nof_requests = int(request.form['nob'])/20
     params = request.form.to_dict(flat=False)
     api_caller(nof_books=nof_books, nof_requests=nof_requests, params=params)

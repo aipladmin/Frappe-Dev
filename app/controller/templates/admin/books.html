@@ -14,7 +14,7 @@
 {% include './notifications.html' %}
 
 <div class="container-fluid">
-  <form method="post" action="{{ url_for('admin.books_to_inv') }}">
+  <form method="POST" action="{{ url_for('admin.books_to_inv') }}">
   <div class="form-group row">
     <label for="inputEmail3" class="col-sm-2 col-form-label">Title</label>
       <select class="col-sm-4 js-example-tags custom-select custom-select-sm" name="title">
