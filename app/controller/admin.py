@@ -1,5 +1,6 @@
 from flask import render_template, Blueprint, request, session, flash, redirect, url_for, jsonify, make_response
-from .controller import mysql_query, Books, Transactions, inventoryManager
+from .controller import mysql_query, WKHTML_CONFIG
+from .admin_controller import Books, Transactions, InventoryManager
 import pdfkit
 import requests
 import math
@@ -28,10 +29,8 @@ def index():
 @admin.route('/books', methods=['GET', 'POST'])
 def books():
     if request.method == 'POST':
-        print("NOB", request.form['nob'])
         nob = int(request.form['nob'])/20
         nobCeil = math.ceil(nob)
-        print(nobCeil)
         params = request.form.to_dict(flat=False)
 
         d = []
@@ -39,9 +38,8 @@ def books():
             params['page'] = int(x)
             params.pop('nob', None)
             r = requests.get("https://frappe.io/api/method/frappe-library", params=params)
-            print(r.url)
-            FrappeData = r.json()
-            d.extend(FrappeData['message'])
+            api_data = r.json()
+            d.extend(api_data['message'])
 
         UD = {'message': d}
         iterData = int(len(UD['message']))
@@ -49,7 +47,6 @@ def books():
             iterData = request.form['nob']
         else:
             iterData = iterData
-        print(iterData)
         my_data = Books(**UD)
         my_data.BooksInsert(iterData=iterData)
         flash('Books Inserted Successfully', 'success')
@@ -63,16 +60,14 @@ def books():
 @admin.route('/inventory', methods=['GET', 'POST'])
 def inventory():
     if request.method == "POST":
-        print(request.form)
         for _ in range(int(request.form['inventory'])):
             mysql_query("INSERT INTO lms.inventory(BID) values({});".format(request.form['IID']))
 
         flash("Inventory Updated.", "success")
         return redirect(url_for('admin.inventory'))
 
-    bookInv = inventoryManager()
+    bookInv = InventoryManager()
     dt = bookInv.inventory_merger()
-    # print(dt['books_inventory'])
     return render_template('admin/inventory.html', data=dt['books_inventory'])
 
 
@@ -125,7 +120,6 @@ def bookings():
 
 @admin.route('/booking/ajax', methods=['GET', 'POST'])
 def booking_ajax():
-    print("CALLING")
     tranObj = Transactions()
     OBJ = tranObj.checkOutstanding(email=request.form['UserID'])
     return jsonify({'bookings': OBJ})
@@ -134,8 +128,7 @@ def booking_ajax():
 @admin.route('/cos', methods=['GET', 'POST'])
 def cos():
     cosObj = Transactions(email='parikh.madhav1999@gmail.com')
-    print(cosObj.checkOutstanding())
-    return "render_template"
+    return "render_template"+str(cosObj.checkOutstanding())
 
 
 @admin.route('/returnbookings', methods=['GET', 'POST'])
@@ -188,7 +181,7 @@ def report():
 
     if request.method == 'POST':
         rendered = render_template('admin/report_pdf.html', data=c, DG=datetime.today().strftime('%d-%m-%Y %H:%M:%S'))
-        pdf = pdfkit.from_string(rendered, False, configuration=config)
+        pdf = pdfkit.from_string(rendered, False, configuration=WKHTML_CONFIG)
         response = make_response(pdf)
         response.headers['Content-Type'] = 'application/pdf'
         if 'view' in request.form:
@@ -208,7 +201,7 @@ def report():
 
 @admin.route('/report1', methods=['GET', 'POST'])
 def report1():
-    data = mysql_query('''SELECT 
+    data = mysql_query('''SELECT
                         books.title,
                         books.authors,
                         books.publisher,
@@ -228,8 +221,9 @@ def report1():
                             INNER JOIN
                         lms.books ON books.BID = inventory.BID;''')
     if request.method == 'POST':
-        rendered = render_template('admin/report1_pdf.html', data=data, DG=datetime.today().strftime('%d-%m-%Y %H:%M:%S'))
-        pdf = pdfkit.from_string(rendered, False, configuration=config)
+        rendered = render_template('admin/report1_pdf.html', data=data,
+                                   DG=datetime.today().strftime('%d-%m-%Y %H:%M:%S'))
+        pdf = pdfkit.from_string(rendered, False, configuration=WKHTML_CONFIG)
         response = make_response(pdf)
         response.headers['Content-Type'] = 'application/pdf'
         if 'view' in request.form:
