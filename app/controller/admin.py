@@ -1,12 +1,14 @@
-from flask import render_template, Blueprint, request, session, flash, redirect, url_for, jsonify, make_response
-from .controller import mysql_query, WKHTML_CONFIG
-from .admin_controller import Books, Transactions, InventoryManager
-import pdfkit
-import requests
-import math
 from datetime import datetime
-import pandas as pd
+
 import matplotlib
+import pandas as pd
+import pdfkit
+from flask import (Blueprint, flash, jsonify, make_response, redirect,
+                   render_template, request, session, url_for)
+
+from .admin_controller import InventoryManager, Transactions, api_caller
+from .controller import WKHTML_CONFIG, mysql_query
+
 matplotlib.use('Agg')
 
 
@@ -29,26 +31,10 @@ def index():
 @admin.route('/books', methods=['GET', 'POST'])
 def books():
     if request.method == 'POST':
-        nob = int(request.form['nob'])/20
-        nobCeil = math.ceil(nob)
+        nof_books = request.form['nob']
+        nof_requests = int(request.form['nob'])/20
         params = request.form.to_dict(flat=False)
-
-        d = []
-        for x in range(1, int(nobCeil)+1):
-            params['page'] = int(x)
-            params.pop('nob', None)
-            r = requests.get("https://frappe.io/api/method/frappe-library", params=params)
-            api_data = r.json()
-            d.extend(api_data['message'])
-
-        UD = {'message': d}
-        iterData = int(len(UD['message']))
-        if int(iterData) > int(request.form['nob']):
-            iterData = request.form['nob']
-        else:
-            iterData = iterData
-        my_data = Books(**UD)
-        my_data.BooksInsert(iterData=iterData)
+        api_caller(nof_books=nof_books, nof_requests=nof_requests, params=params)
         flash('Books Inserted Successfully', 'success')
         return redirect(url_for('admin.books'))
     title = mysql_query("select distinct(title) as 'title' from lms.books")

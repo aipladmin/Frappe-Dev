@@ -1,7 +1,11 @@
-from .controller import mysql_query
-import datetime
-from typing import Optional, List
+import math
 from dataclasses import dataclass
+from datetime import datetime
+from typing import List, Optional
+
+import requests
+
+from .controller import mysql_query
 
 
 class Transactions:
@@ -10,7 +14,6 @@ class Transactions:
 
     @staticmethod
     def os_amt_validator(days):
-        # email=self.email
         os_amt = 50 * int(days)
         return str(os_amt)
 
@@ -73,7 +76,24 @@ class InventoryManager:
         return {'books': books, "inventory": inventoryDt, 'books_inventory': lst}
 
 
-def api_caller():
+def api_caller(nof_books, nof_requests, params):
+    nobCeil = math.ceil(nof_requests)
+    d = []
+    for x in range(1, int(nobCeil)+1):
+        params['page'] = int(x)
+        params.pop('nob', None)
+        r = requests.get("https://frappe.io/api/method/frappe-library", params=params)
+        if r.status_code != 200:
+            return "API Error: " + r.status_code+"\n"+r.text
+        api_data = r.json()
+        d.extend(api_data['message'])
+
+    UD = {'message': d}
+    iterData = int(len(UD['message']))
+    if int(iterData) > int(nof_books):
+        iterData = nof_books
+    my_data = Books(**UD)
+    my_data.BooksInsert(iterData=iterData)
     return "api"
 
 
@@ -100,15 +120,13 @@ class Books:
 
     def BooksInsert(self, iterData):
         message = self.message
-        # print(message)
         i = 1
         for dic in message:
-            print("*"*50, i, "*"*50)
+
             if i > int(iterData):
                 break
 
             dictStrip = {k.strip(): v.strip() for k, v in dic.items()}
-            # print(dictStrip)
             dit = mysql_query("select  bookID from lms.books;")
             ditList = []
             for y in dit:
@@ -117,17 +135,12 @@ class Books:
 
             dateObj = datetime.strptime(str(dictStrip['publication_date']), '%m/%d/%Y')
             i += 1
-            # print(ditList,dic['bookID'])
 
-            print(str(dictStrip['bookID']), ditList)
             if str(dictStrip['bookID']) in ditList:
-                print("inside")
                 BID = mysql_query("select BID from lms.books where bookID={};".format(int(dictStrip['bookID'])))
-                print(BID)
                 BID = BID[0]['BID']
                 mysql_query("insert into lms.inventory(BID) values({});".format(int(BID)))
             else:
-                print("outside")
                 mysql_query('INSERT INTO lms.books({})values{a}'.format(','.join(dictStrip),
                             a=(int(dictStrip['bookID']),
                                ''.join(dictStrip['title']), ''.join(dictStrip['authors']),
