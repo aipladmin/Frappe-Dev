@@ -8,6 +8,7 @@ from flask import (Blueprint, flash, jsonify, make_response, redirect,
 
 from .admin_controller import InventoryManager, Transactions, api_caller
 from .controller import WKHTML_CONFIG, mysql_query
+from .models import db, User
 
 matplotlib.use('Agg')
 
@@ -20,7 +21,23 @@ admin = Blueprint('admin', __name__, template_folder='templates', static_folder=
 # def before_request():
 #     session.pop('email', '')
 #     session.clear()
-
+@admin.route('/Testing', methods=['GET'])
+def user_records():
+    """Create a user via query string parameters."""
+    username = "madhav"
+    email = "madhav"
+    if username and email:
+        new_user = User(
+            username=username,
+            email=email,
+            created=datetime.now(),
+            bio="In West Philadelphia born and raised, \
+            on the playground is where I spent most of my days",
+            admin=False
+        )
+        db.session.add(new_user)  # Adds new User record to database
+        db.session.commit()  # Commits all changes
+    return make_response(f"{new_user} successfully created!")
 
 @admin.route('/')
 @admin.route('/index')

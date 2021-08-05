@@ -24,6 +24,7 @@ class MyJSONEncoder(flask.json.JSONEncoder):
 
 
 mysql = MySQL()
+db = SQLAlchemy()
 
 
 def create_app():
@@ -34,17 +35,6 @@ def create_app():
 
     app.config.from_object(Config)
     app.json_encoder = MyJSONEncoder
-
-    # app.config['SQLALCHEMY_DATABASE_URI'] = 'sqlite:///db.sqlite3'
-    # app.config['SESSION_TYPE'] = 'sqlalchemy'
-    # app.config['SQLALCHEMY_TRACK_MODIFICATIONS'] = False  # quiet warning message
-
-    # db = SQLAlchemy(app)
-
-    # app.config['SESSION_SQLALCHEMY']=db
-    # sess = Session(app)
-    # db.init_app(app)
-    # db.create_all()
 
     mysql.init_app(app)
 
