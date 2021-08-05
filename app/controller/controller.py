@@ -36,14 +36,14 @@ def user_sess(f):
 
 
 def mysql_query(sql):
-    print(sql)
+    logging.warning(sql)
     connection = mysql.connect()
 
     cursor = connection.cursor()
     if sql.lower().strip().startswith('select'):
         connection.escape_string(sql)
         cursor.execute(sql)
-        logging.warning(sql)
+        logging.debug(sql)
         columns = [column[0].strip() for column in cursor.description]
         results = [dict(zip(columns, row)) for row in cursor.fetchall()]
         cursor.close()
@@ -51,7 +51,7 @@ def mysql_query(sql):
         return results
     else:
         cursor.execute(sql)
-        logging.warning(sql)
+        logging.debug(sql)
 
         mysql_query.last_row_id = cursor.lastrowid
 
