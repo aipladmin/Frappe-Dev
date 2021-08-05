@@ -1,5 +1,6 @@
 import pdfkit
 import platform
+import logging
 from flask import Flask, session, redirect, url_for
 from functools import wraps
 from datetime import datetime
@@ -24,6 +25,8 @@ if platform.system().lower() == "linux":
 if platform.system().lower() == "windows":
     config = pdfkit.configuration(wkhtmltopdf='C:\\Program Files\\wkhtmltopdf\\bin\\wkhtmltopdf.exe')
 
+logging.basicConfig(level=logging.WARNING)
+
 
 # DECORATORS
 def user_sess(f):
@@ -40,22 +43,18 @@ def mysql_query(sql):
     connection = mysql.connect()
 
     cursor = connection.cursor()
-    if sql.strip().split(' ')[0].lower() == "select":
+    if sql.lower().strip().startswith('select'):
         connection.escape_string(sql)
         cursor.execute(sql)
-        print(cursor._executed)
-
+        logging.warning(sql)
         columns = [column[0].strip() for column in cursor.description]
-        results = []
-        for row in cursor.fetchall():
-            results.append(dict(zip(columns, row)))
-        data = results
+        results = [dict(zip(columns, row)) for row in cursor.fetchall()]
         cursor.close()
         connection.close()
-        return data
-    if sql.strip().split(' ')[0].lower() != "select":
+        return results
+    else:
         cursor.execute(sql)
-        print(cursor._executed)
+        logging.warning(sql)
 
         mysql_query.last_row_id = cursor.lastrowid
 
