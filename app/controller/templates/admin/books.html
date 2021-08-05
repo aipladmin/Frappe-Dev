@@ -1,0 +1,62 @@
+{% extends 'index.html' %}
+{% block content %}
+<style>
+  .input {
+  padding-right: 0;  
+  padding-left: 0;
+}
+</style>
+  <!-- Page Heading -->
+  <div class="d-sm-flex align-items-center justify-content-between mb-4">
+    <h1 class="h3 mb-0 text-gray-800">Books</h1>
+    <!-- <button  class="d-none d-sm-inline-block btn btn-sm btn-primary shadow-sm" data-toggle="modal" data-target="#AddCust"><i class="fas fa-plus fa-sm text-white-50"></i>&nbsp;  Details</button> -->
+    
+  </div>
+
+{% include 'notifications.html' %}
+
+<div class="container-fluid">
+  <form method="post" action="{{ url_for('admin.books') }}">
+  <div class="form-group row">
+    <label for="inputEmail3" class="col-sm-2 col-form-label">Title</label>
+      <select class="col-sm-4 js-example-tags custom-select custom-select-sm" name="title">
+        <option value="" >Select Title</option>
+        {% for x in title %}
+          <option value="{{ x.title }}">{{ x.title }}</option>
+        {% endfor %}
+      </select>
+  </div>
+  <div class="form-group row">
+    <label for="inputPassword3" class="col-sm-2 col-form-label">Author</label>
+     <select class="col-sm-4 js-example-tags custom-select custom-select-sm" name="authors">
+        <option value="" >Select Author(s)</option>
+        {% for x in authors %}
+          <option value="{{ x.authors }}">{{ x.authors }}</option>
+        {% endfor %}
+      </select>
+  </div>
+  
+  <div class="form-group row">
+      <label for="inputPassword3" class="col-sm-2 col-form-label">Publisher</label>
+       <select class="col-sm-4 js-example-tags custom-select custom-select-sm" name="publisher">
+          <option value="" >Select Publisher</option>
+          {% for x in publisher %}
+            <option value="{{ x.publisher }}">{{ x.publisher }}</option>
+          {% endfor %}
+        </select>
+  </div>
+   <div class="form-group row">
+      <label for="nob" class="col-sm-2 col-form-label">No of Books</label>
+      <input type="text" class="form-control col-sm-4" name="nob" value="20" />
+  </div>
+  
+ 
+  <div class="form-group row">
+    <div class="col-sm-10">
+      <button type="submit" class="btn btn-success">Import</button>
+    </div>
+  </div>
+</form>
+</div>
+
+{% endblock %}

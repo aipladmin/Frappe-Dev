@@ -1,0 +1,50 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <!-- Required meta tags -->
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
+
+    <!-- Bootstrap CSS -->
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@4.6.0/dist/css/bootstrap.min.css" integrity="sha384-B0vP5xmATw1+K9KRQjQERJvTumQW0nPEzvF6L/Z6nronJ3oUOFUFpCjEUQouq2+l" crossorigin="anonymous">
+
+  </head>
+  <body>
+      <div class="container-fluid h2 text-center">
+          <span style="font-family:Arial, Helvetica, sans-serif;">District Library</span>
+      </div>
+      <br/>
+      <div class="container-fluid h4 ">
+            <span class="text-center" style="font-family:'Gill Sans', 'Gill Sans MT', Calibri, 'Trebuchet MS', sans-serif;">
+                User Amount Wise Report
+            </span>
+      </div>
+      <br/>
+    <div class="container-fluid">
+        <table class="table table-striped">
+        <thead class="thead-dark">
+            <tr>
+                <th>Full Name</th>
+                <th>Email ID</th>
+                <th>Mobile No</th>
+                <th>Auth</th>
+                <th>Amount</th>
+            </tr>
+        </thead>
+        <tbody>
+            {% for x,y in data.items() %}
+                <tr>
+                    {% for value in x %}
+                        <td>{{ value }}</td>
+                    {% endfor %}
+                    <td>{{ y }}</td>
+                </tr>
+            {% endfor %}
+        </tbody>
+    </table>
+    </div>
+    <footer>
+        {{ DG }}
+    </footer>
+</body>
+</html>

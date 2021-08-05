@@ -1,0 +1,83 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+	<title>User</title>
+	<meta charset="UTF-8">
+	<meta name="viewport" content="width=device-width, initial-scale=1">
+<!--===============================================================================================-->	
+	<link rel="icon" type="image/png" href="images/icons/favicon.ico"/>
+<!--===============================================================================================-->
+	<link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.2.1/css/bootstrap.min.css" integrity="sha384-GJzZqFGwb1QTTN6wy59ffF1BuGJpLSa9DkKMp0DgiMDm4iYMj70gZWKYbI706tWS" crossorigin="anonymous">
+<!--===============================================================================================-->
+	<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@fortawesome/fontawesome-free@5.15.3/css/fontawesome.min.css" integrity="undefined" crossorigin="anonymous">
+<!--===============================================================================================-->
+	<link rel="stylesheet" href="https://cdn.linearicons.com/free/1.0.0/icon-font.min.css">
+<!--===============================================================================================-->
+	<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/animate.css/4.1.1/animate.css" integrity="sha512-phGxLIsvHFArdI7IyLjv14dchvbVkEDaH95efvAae/y2exeWBQCQDpNFbOTdV1p4/pIa/XtbuDCnfhDEIXhvGQ==" crossorigin="anonymous" referrerpolicy="no-referrer" />
+<!--===============================================================================================-->	
+	<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/hamburgers/1.1.3/hamburgers.min.css" integrity="sha512-+mlclc5Q/eHs49oIOCxnnENudJWuNqX5AogCiqRBgKnpoplPzETg2fkgBFVC6WYUVxYYljuxPNG8RE7yBy1K+g==" crossorigin="anonymous" referrerpolicy="no-referrer" />
+<!--===============================================================================================-->
+	<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/animsition/4.0.2/css/animsition.min.css" integrity="sha512-SagM1PHxt5mWDyWARVY6UOdhM5A8J+R1UqIWcGfiwOd+be7uHQagB+JQOmfVZF8jjJQqbyuWzw/KXfb4yqjBkQ==" crossorigin="anonymous" referrerpolicy="no-referrer" />
+
+	
+	<link rel="stylesheet" type="text/css" href="{{ url_for('.static',filename='USER/css/util.css') }}" />
+	<link rel="stylesheet" type="text/css" href="{{ url_for('.static',filename='USER/css/main.css') }}">
+<!--===============================================================================================-->
+</head>
+<body>
+	
+	<div class="limiter">
+		<div class="container-login100">
+			<div class="wrap-login100">
+				<form class="login100-form validate-form" method="POST" action="{{ url_for('user.user_index') }}">
+					<span class="login100-form-title p-b-34">
+						View
+					</span>
+					
+					<div class="wrap-input100 rs1-wrap-input100 validate-input m-b-20" style="width:100%" data-validate="Type user name">
+						<input id="first-name" class="input100" type="email" name="email" placeholder="Email Address">
+						<span class="focus-input100"></span>
+					</div>
+					<!-- <div class="wrap-input100 rs2-wrap-input100 validate-input m-b-20" data-validate="Type password">
+						<input class="input100" type="password" name="pass" placeholder="Password">
+						<span class="focus-input100"></span>
+					</div> -->
+					
+					<div class="container-login100-form-btn">
+						<button class="login100-form-btn" type="submit">
+							Explore
+						</button>
+					</div>
+
+					<div class="w-full text-center p-t-27 p-b-239">
+						
+					</div>
+				</form>
+
+				<div class="login100-more" style="background-image: url('{{ url_for('.static',filename='USER/images/bg-01.jpg') }}') ; "></div>
+			</div>
+		</div>
+	</div>
+	
+	
+
+	<div id="dropDownSelect1"></div>
+	
+<!--===============================================================================================-->
+	<script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.2.1/jquery.min.js" integrity="sha512-3P8rXCuGJdNZOnUx/03c1jOTnMn3rP63nBip5gOP2qmUh5YAdVAvFZ1E+QLZZbC1rtMrQb+mah3AfYW11RUrWA==" crossorigin="anonymous" referrerpolicy="no-referrer"></script>
+<!--===============================================================================================-->
+	<!-- <script src="vendor/animsition/js/animsition.min.js"></script>
+<!--===============================================================================================-->
+	<!-- <script src="vendor/bootstrap/js/popper.js"></script>
+	<script src="vendor/bootstrap/js/bootstrap.min.js"></script> -->
+<!--===============================================================================================-->
+<!--===============================================================================================-->
+	<!-- <script src="vendor/daterangepicker/moment.min.js"></script>
+	<script src="vendor/daterangepicker/daterangepicker.js"></script> -->
+<!--===============================================================================================-->
+	<!-- <script src="vendor/countdowntime/countdowntime.js"></script> --> -->
+<!--===============================================================================================-->
+	<script src="{{ url_for('.static',filename='USER/js/main.js')}}"></script>
+
+</body>
+</html>

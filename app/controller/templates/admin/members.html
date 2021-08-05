@@ -1,0 +1,49 @@
+{% extends 'index.html' %}
+{% block content %}
+<style>
+  .input {
+  padding-right: 0;  
+  padding-left: 0;
+}
+</style>
+
+ <!-- Page Heading -->
+  <div class="d-sm-flex align-items-center justify-content-between mb-4">
+    <h1 class="h3 mb-0 text-gray-800">Members</h1>
+    <form method="post" action="{{ url_for('admin.members') }}">
+        <button type="submit" name="detailedInfo" class="d-none d-sm-inline-block btn btn-sm btn-primary shadow-sm"><i class="fas fa-plus fa-sm text-white-50"></i>&nbsp;  View Detailed Information</button>
+    </form> 
+  </div>
+
+{% include 'notifications.html' %}
+
+<div class="container-fluid">
+        <form method="POST" action="{{ url_for('admin.members') }}">
+    
+    <div class="form-group row">
+        <label for="fullName" class="col-sm-2 col-form-label">Full Name</label>
+        <div class="col-sm-4">
+        <input type="text"  class="form-control" name="Full_Name">
+        </div>
+    </div>
+    <div class="form-group row">
+        <label for="inputEmail3" class="col-sm-2 col-form-label">Email</label>
+        <div class="col-sm-4">
+        <input type="email"  class="form-control" id="inputEmail3" name="Email_ID">
+        </div>
+    </div>
+    <div class="form-group row">
+        <label for="inputPassword3" class="col-sm-2 col-form-label">Mobile No</label>
+        <div class="col-sm-4">
+        <input type="text"  class="form-control" id="inputPassword3" name="Mobile_No">
+        </div>
+    </div>
+    <div class="form-group row">
+        <div class="col-sm-10">
+        <button type="submit" class="btn btn-success">Submit</button>
+        </div>
+    </div>
+    </form>
+</div>
+
+{% endblock %}

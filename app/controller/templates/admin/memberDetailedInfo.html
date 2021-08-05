@@ -1,0 +1,61 @@
+{% extends 'index.html' %}
+{% block content %}
+<style>
+  .input {
+  padding-right: 0;  
+  padding-left: 0;
+}
+</style>
+
+ <!-- Page Heading -->
+  <div class="d-sm-flex align-items-center justify-content-between mb-4">
+    <h1 class="h3 mb-0 text-gray-800">Detailed Member Info</h1>
+  </div>
+
+{% include 'notifications.html' %}
+
+<div class="container-fluid">
+    <table class="table table-striped">
+  <thead>
+    <tr>
+      <th scope="col">Full Name</th>
+      <th scope="col">Mobile No</th>
+      <th scope="col">Email ID</th>
+      <th scope="col">Auth</th>
+    </tr>
+  </thead>
+  <tbody>
+    
+    {% for x in data %}
+    <form method="POST" action="{{ url_for('admin.memberDetailedInfo') }}">
+        <tr>
+            <td>
+                <input type="text" value="{{ x.Full_Name }} " class="form-control" name="Full_Name">
+            </td>
+            <td>
+                 <input type="text" value="{{ x.Mobile_No }} " class="form-control" name="Mobile_No">
+            </td>
+            <td>
+                 <input type="text" value="{{ x.Email_ID }} " class="form-control" name="Email_ID">
+            </td>
+             <td>
+                <select class="form-control" name="Auth"> 
+                    <option value="{{ x.Auth }}">{{ x.Auth }}</option>
+                    <option value="Activated">Activated</option>
+                    <option value="Deactivated">Deactivated</option>
+                    <option value="Terminated">Terminated</option>
+                </select>
+            </td>
+            <td>
+                <button type="submit" class="btn btn-success" name="MID" value="{{ x.MID }}">Update</button>
+            </td>
+        </tr>
+    </form>        
+    {% endfor %}
+
+    </tr>
+  </tbody>
+</table>
+</div>
+
+{% endblock %}

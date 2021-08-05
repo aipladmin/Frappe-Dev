@@ -1,0 +1,116 @@
+{% extends 'index.html' %}
+{% block content %}
+<style>
+  .input {
+  padding-right: 0;  
+  padding-left: 0;
+}
+</style>
+<script>
+    $(document).ready(function(){
+         $("#UserID").on('change', function(){
+             $.ajax({
+                data:{
+                Request_ID:"0",
+                UserID:$("#UserID").val(),
+                        },
+                type:'POST',
+                url:'/booking/ajax'
+            }).done(function(result){
+                 if(result.error){alert("Error");}
+        else{
+               // console.log("DATA");
+              var opts = $.parseJSON(JSON.stringify(result));
+              console.log(opts);
+              $('#myTable').empty();
+             
+
+              if(opts['bookings'].length == 0){
+                  event_data += '<tr>';
+                  event_data += '<td class="text-warning">'+"No Books Issued. "+'</td>';
+                  event_data += '</tr>';
+              }else{
+                var opts = opts['bookings'];
+                var sum = 0;
+                var event_data ='';
+               for (var i=0; i < opts.length; i++) {
+                    sum += parseInt(opts[i].osAmount) ;
+                    event_data += '<tr class="text-dark">';
+                    event_data += '<td>'+opts[i].Full_Name+'</td>';
+                    event_data += '<td>'+opts[i].Email_ID+'</td>';
+                    event_data += '<td>'+moment(opts[i].Issued).format('DD-MM-YYYY')+'</td>';
+                    event_data += '<td>'+opts[i].osAmount+'</td>';
+                    event_data += '<td>'+opts[i].osTimePeriod+'</td>';
+                    event_data += '</tr>';
+                   }
+                }
+               if(parseInt(sum) >=500){
+                   $('#fisubmit').attr("disabled");
+               }
+               else{
+                  $('#fisubmit').removeAttr('disabled');
+               }
+                $("#myTable").append(event_data);
+                }
+            });
+         });
+    });
+</script>
+
+<!-- Page Heading -->
+  <div class="d-sm-flex align-items-center justify-content-between mb-4">
+    <h1 class="h3 mb-0 text-gray-800">Bookings</h1>
+    <!-- <button  class="d-none d-sm-inline-block btn btn-sm btn-primary shadow-sm" data-toggle="modal" data-target="#AddCust"><i class="fas fa-plus fa-sm text-white-50"></i>&nbsp;  Details</button> -->
+    
+  </div>
+
+{% include 'notifications.html' %}
+
+<div class="container-fluid">
+  <form method="POST" action="{{ url_for('admin.bookings') }}">
+  <div class="form-group row">
+    <label for="inputEmail3" class="col-sm-2 col-form-label">User</label>
+      <select class="col-sm-4 js-example-basic-single custom-select custom-select-sm" name="User" id="UserID">
+        <option selected>Select User</option>
+        {% for x in User %}
+          <option value="{{ x.Email_ID }}">{{ x.Full_Name }}</option>
+        {% endfor %}
+      </select>
+  </div>
+   <div class="form-group row">
+    <label for="inputEmail3" class="col-sm-2 col-form-label text-dark">Member Information</label>
+  </div>
+  <div class="col-sm-12">
+    <table class="table table-stripped" >
+      <thead>
+        <th>Full Name</th>
+        <th>Email ID</th>
+        <th>Issue</th>
+        <th>Amount Due</th>
+        <th>Days </th>
+      </thead>
+      <tbody id="myTable">
+
+      </tbody>
+    </table>
+  </div>
+  <div class="form-group row">
+    <label for="inputEmail3" class="col-sm-2 col-form-label">Books</label>
+      <select class="col-sm-8 js-example-basic-single custom-select custom-select-sm" name="books" id="BookID">
+        <option selected>Select Books</option>
+        {% for x in books %}
+          <option value="{{ x.IID }}">{{ x.authors~" - "~x.title~" - "~x.publisher}}</option>
+        {% endfor %}
+      </select>
+  </div>
+  
+ 
+  <div class="form-group row">
+    <div class="col-sm-10">
+      <button type="submit" class="btn btn-success" id="fisubmit" disabled>Book </button>
+    </div>
+  </div>
+</form>
+</div>
+
+{% endblock %}
