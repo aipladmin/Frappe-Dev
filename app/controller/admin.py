@@ -28,20 +28,22 @@ def index():
     return render_template('index.html')
 
 
-@admin.route('/books', methods=['GET', 'POST'])
+@admin.route('/books', methods=['GET'])
 def books():
-    if request.method == 'POST':
-        nof_books = request.form['nob']
-        nof_requests = int(request.form['nob'])/20
-        params = request.form.to_dict(flat=False)
-        api_caller(nof_books=nof_books, nof_requests=nof_requests, params=params)
-        flash('Books Inserted Successfully', 'success')
-        return redirect(url_for('admin.books'))
     title = mysql_query("select distinct(title) as 'title' from lms.books")
     authors = mysql_query("select distinct(authors) as 'authors' from lms.books")
     publisher = mysql_query("select distinct(publisher) as 'publisher' from lms.books")
     return render_template('admin/books.html', title=title, authors=authors, publisher=publisher)
 
+
+@admin.route('/books/insert', methods=['POST'])
+def books_to_inv():
+    nof_books = request.form['nob'] 
+    nof_requests = int(request.form['nob'])/20
+    params = request.form.to_dict(flat=False)
+    api_caller(nof_books=nof_books, nof_requests=nof_requests, params=params)
+    flash('Books Inserted Successfully', 'success')
+    return redirect(url_for('admin.books'))
 
 @admin.route('/inventory', methods=['GET', 'POST'])
 def inventory():

@@ -9,14 +9,12 @@
   <!-- Page Heading -->
   <div class="d-sm-flex align-items-center justify-content-between mb-4">
     <h1 class="h3 mb-0 text-gray-800">Books</h1>
-    <!-- <button  class="d-none d-sm-inline-block btn btn-sm btn-primary shadow-sm" data-toggle="modal" data-target="#AddCust"><i class="fas fa-plus fa-sm text-white-50"></i>&nbsp;  Details</button> -->
-    
   </div>
 
-{% include 'notifications.html' %}
+{% include './notifications.html' %}
 
 <div class="container-fluid">
-  <form method="post" action="{{ url_for('admin.books') }}">
+  <form method="post" action="{{ url_for('admin.books_to_inv') }}">
   <div class="form-group row">
     <label for="inputEmail3" class="col-sm-2 col-form-label">Title</label>
       <select class="col-sm-4 js-example-tags custom-select custom-select-sm" name="title">
