@@ -66,7 +66,6 @@ class InventoryManager:
         '''
         books = mysql_query('Select books.BID,books.bookID,title,authors,publisher,isbn from lms.books')
         inventoryDt = mysql_query("Select count(*) as 'CInt',BID from lms.inventory group by BID ")
-        print(inventoryDt)
         lst = []
         for x in books:
             for y in inventoryDt:
@@ -82,7 +81,10 @@ def api_caller(nof_books, nof_requests, params):
     for x in range(1, int(nobCeil)+1):
         params['page'] = int(x)
         params.pop('nob', None)
-        r = requests.get("https://frappe.io/api/method/frappe-library", params=params)
+        try:
+            r = requests.get("https://frappe.io/api/method/frappe-library", params=params)
+        except requests.ConnectionError:
+            return "Connection Error"
         if r.status_code != 200:
             return "API Error: " + r.status_code+"\n"+r.text
         api_data = r.json()
