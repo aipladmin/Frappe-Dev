@@ -1,6 +1,6 @@
 from flask import render_template, Blueprint, session, request
 from datetime import timedelta
-from .controller import app, mysql_query
+from .controller import mysql_query
 
 
 user = Blueprint('user', __name__, template_folder='templates', static_folder='static',
