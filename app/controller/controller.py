@@ -1,29 +1,9 @@
 import pdfkit
 import platform
 import logging
-from flask import Flask, session, redirect, url_for
+from flask import session, redirect, url_for
 from functools import wraps
-from app.config import Config
-from flaskext.mysql import MySQL
-from flask_sqlalchemy import SQLAlchemy
-
-
-mysql = MySQL()
-db = SQLAlchemy()
-
-app = Flask(__name__)
-app.config['SQLALCHEMY_DATABASE_URI'] = 'sqlite:///settings.sqlite3'
-app.config['SQLALCHEMY_TRACK_MODIFICATIONS'] = False  # quiet warning message
-db = SQLAlchemy(app)
-app.config['SESSION_SQLALCHEMY'] = db
-db.init_app(app)
-with app.app_context():
-    db.create_all()  # Create sql tables for our data models
-
-app.config['MYSQL_DATABASE_USER'] = str(Config.DatabaseConfig.get('MYSQL_DATABASE_USER'))
-app.config['MYSQL_DATABASE_PASSWORD'] = str(Config.DatabaseConfig.get('MYSQL_DATABASE_PASSWORD'))
-app.config['MYSQL_DATABASE_HOST'] = str(Config.DatabaseConfig.get('MYSQL_DATABASE_HOST'))
-mysql.init_app(app)
+from app import mysql
 
 
 if platform.system().lower() == "linux":
