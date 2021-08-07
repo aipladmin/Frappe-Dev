@@ -22,9 +22,17 @@ admin = Blueprint('admin', __name__, template_folder='templates', static_folder=
 #     session.pop('email', '')
 #     session.clear()
 
-@admin.route('/settings', methods=['GET'])
+@admin.route('/settings', methods=['GET','POST'])
 def settings():
-
+    if request.method == 'POST':
+        validityPeriod = request.form['validityPeriod']
+        amountToCharge = request.form['amountToCharge']
+        mysql_query(''' INSERT INTO `lms`.`settings`
+                        (`Validity`,
+                        `Charges`,Timestamp)
+                        VALUES
+                        ({},{},'{}'); '''.format(validityPeriod, amountToCharge, datetime.now()))
+        return "Settings"
     return render_template('admin/settings.html')
 
 
@@ -68,10 +76,8 @@ def inventory():
 @admin.route('/members', methods=['GET', 'POST'])
 def members():
     if request.method == 'POST':
-        if 'detailedInfo' in request.form:
-            return redirect(url_for('admin.memberDetailedInfo'))
         mysql_query("insert into lms.members(Full_Name, Email_ID,Mobile_No) values('{}','{}',{})".format(
-            request.form['Full_Name'], request.form['Email_ID'], request.form['Mobile_No']))
+                    request.form['Full_Name'], request.form['Email_ID'], request.form['Mobile_No']))
         flash("Member Successfully Added.", "success")
         return redirect(url_for('admin.members'))
     return render_template('admin/members.html')
