@@ -2,7 +2,6 @@ from flask import Flask
 from flaskext.mysql import MySQL
 import decimal
 import flask.json
-from flask_sqlalchemy import SQLAlchemy
 from .config import Config
 import sentry_sdk
 from sentry_sdk.integrations.flask import FlaskIntegration
@@ -24,7 +23,6 @@ class MyJSONEncoder(flask.json.JSONEncoder):
 
 
 mysql = MySQL()
-db = SQLAlchemy()
 
 
 def create_app():

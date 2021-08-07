@@ -1,0 +1,31 @@
+{% extends 'index.html' %}
+{% block content %}
+<!-- Page Heading -->
+<div class="d-sm-flex align-items-center justify-content-between mb-4">
+    <h1 class="h3 mb-0 text-gray-800">Settings</h1>
+</div>
+
+{% include './notifications.html' %}
+
+<div class="container-fluid">
+    <form>
+        <div class="form-group row">
+            <label for="validityPeriod" class="col-sm-2 col-form-label">Vaildity Period</label>
+            <div class="col-sm-10">
+            <input type="text" class="form-control" id="validityPeriod">
+            </div>
+        </div>
+        <div class="form-group row">
+            <label for="atbc" class="col-sm-2 col-form-label">Amount to be Charged</label>
+            <div class="col-sm-10">
+            <input type="text" class="form-control" id="atbc">
+            </div>
+        </div>
+        <div class="form-group row">
+            <div class="col-sm-10">
+            <button type="submit" class="btn btn-primary">Save</button>
+            </div>
+        </div>
+        </form>
+</div>
+{% endblock %}
