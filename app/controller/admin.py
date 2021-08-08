@@ -8,18 +8,64 @@ from flask import (Blueprint, flash, jsonify, make_response, redirect,
 
 from .admin_controller import InventoryManager, Transactions, api_caller
 from .controller import WKHTML_CONFIG, mysql_query
+from flask import current_app as app
+from .models import db, Settings
 
 matplotlib.use('Agg')
 
 
 admin = Blueprint('admin', __name__, template_folder='templates', static_folder='static',
-                  static_url_path='/controller/static', url_prefix='/')
+                  static_url_path='/controller/static')
 
 
-@admin.before_request
-def before_request():
-    session.pop('email', '')
-    session.clear()
+# @admin.before_request
+# def before_request():
+#     session.pop('email', '')
+#     session.clear()
+
+@admin.route('/testing', methods=['GET'])
+def user_records():
+    """Create a user via query string parameters."""
+    username = "madhav"
+    email = "madhav"
+    if username and email:
+        existing_user = Settings.query.order_by(Settings.timestamp.desc()).first()
+        app.logger.info(existing_user.validity, str(existing_user.timestamp))
+        if existing_user:
+            return str(existing_user)+"DONE"
+    new_settings = Settings(
+            validity=30,
+            charges=30,
+            timestamp=datetime.now()
+        )  # Create an instance of the User class
+    db.session.add(new_settings)  # Adds new User record to database
+    db.session.commit()
+    idd = new_settings.id
+    data = Settings.query.all()
+    for x in data:
+        app.logger.info(x.validity)
+    return str(Settings.query.all())+str(idd)
+
+
+@admin.route('/settings', methods=['GET', 'POST'])
+def settings():
+    return render_template('admin/settings.html',
+                           exsisting_settings=Settings.query.order_by(Settings.timestamp.desc()).first())
+
+
+@admin.route('/settings-update', methods=['POST'])
+def settings_post():
+    validityPeriod = request.form['validityPeriod']
+    amountToCharge = request.form['amountToCharge']
+    new_settings = Settings(
+            validity=int(validityPeriod),
+            charges=int(amountToCharge),
+            timestamp=datetime.now()
+        )
+    db.session.add(new_settings)
+    db.session.commit()
+    flash("Settings Updated Successfully.","success")
+    return redirect(url_for('admin.settings'))
 
 
 @admin.route('/')
@@ -28,19 +74,22 @@ def index():
     return render_template('index.html')
 
 
-@admin.route('/books', methods=['GET', 'POST'])
+@admin.route('/books', methods=['GET'])
 def books():
-    if request.method == 'POST':
-        nof_books = request.form['nob']
-        nof_requests = int(request.form['nob'])/20
-        params = request.form.to_dict(flat=False)
-        api_caller(nof_books=nof_books, nof_requests=nof_requests, params=params)
-        flash('Books Inserted Successfully', 'success')
-        return redirect(url_for('admin.books'))
     title = mysql_query("select distinct(title) as 'title' from lms.books")
     authors = mysql_query("select distinct(authors) as 'authors' from lms.books")
     publisher = mysql_query("select distinct(publisher) as 'publisher' from lms.books")
     return render_template('admin/books.html', title=title, authors=authors, publisher=publisher)
+
+
+@admin.route('/insert', methods=['POST'])
+def books_to_inv():
+    nof_books = request.form['nob']
+    nof_requests = int(request.form['nob'])/20
+    params = request.form.to_dict(flat=False)
+    api_caller(nof_books=nof_books, nof_requests=nof_requests, params=params)
+    flash('Books Inserted Successfully', 'success')
+    return redirect(url_for('admin.books'))
 
 
 @admin.route('/inventory', methods=['GET', 'POST'])
@@ -60,10 +109,8 @@ def inventory():
 @admin.route('/members', methods=['GET', 'POST'])
 def members():
     if request.method == 'POST':
-        if 'detailedInfo' in request.form:
-            return redirect(url_for('admin.memberDetailedInfo'))
         mysql_query("insert into lms.members(Full_Name, Email_ID,Mobile_No) values('{}','{}',{})".format(
-            request.form['Full_Name'], request.form['Email_ID'], request.form['Mobile_No']))
+                    request.form['Full_Name'], request.form['Email_ID'], request.form['Mobile_No']))
         flash("Member Successfully Added.", "success")
         return redirect(url_for('admin.members'))
     return render_template('admin/members.html')
@@ -107,26 +154,26 @@ def bookings():
 @admin.route('/booking/ajax', methods=['GET', 'POST'])
 def booking_ajax():
     tranObj = Transactions()
-    OBJ = tranObj.checkOutstanding(email=request.form['UserID'])
+    OBJ = tranObj.check_outstanding(email=request.form['UserID'])
     return jsonify({'bookings': OBJ})
 
 
 @admin.route('/cos', methods=['GET', 'POST'])
 def cos():
     cosObj = Transactions(email='parikh.madhav1999@gmail.com')
-    return "render_template"+str(cosObj.checkOutstanding())
+    return "render_template"+str(cosObj.check_outstanding())
 
 
 @admin.route('/returnbookings', methods=['GET', 'POST'])
 def returnBooks():
     user = mysql_query("select * from lms.members")
     cosObj = Transactions()
-    gd = cosObj.checkOutstanding()
+    gd = cosObj.check_outstanding()
     if request.method == 'POST':
 
         if 'getData' in request.form:
             cosObj = Transactions()
-            gd = cosObj.checkOutstanding(email=request.form['gdEmail'])
+            gd = cosObj.check_outstanding(email=request.form['gdEmail'])
             return render_template('admin/returnBooks.html', user=user, gd=gd, enableAct="enableAct")
         elif 'gdReturns' in request.form:
             mysql_query("UPDATE lms.transactions SET status='returned' WHERE transactions.TID={}".format(
@@ -149,7 +196,7 @@ def returnBooks():
 def report():
     from collections import defaultdict
     tranObj = Transactions()
-    OBJ = tranObj.checkOutstanding()
+    OBJ = tranObj.check_outstanding()
     c = defaultdict(int)
     for d in OBJ:
         c[d['Full_Name'], d['Email_ID'], d['Mobile_No'], d['Auth']] += int(d['osAmount'])

@@ -1,17 +1,15 @@
 from flask import Flask
 from flaskext.mysql import MySQL
 import decimal
-import logging
 import flask.json
-from flask_sqlalchemy import SQLAlchemy
 from .config import Config
 import sentry_sdk
+from flask_sqlalchemy import SQLAlchemy
 from sentry_sdk.integrations.flask import FlaskIntegration
 
 sentry_sdk.init(
     dsn="https://17484623a4d4464f8ce92018281972d9@o416140.ingest.sentry.io/5802801",
     integrations=[FlaskIntegration()],
-
     traces_sample_rate=1.0
 )
 
@@ -25,7 +23,7 @@ class MyJSONEncoder(flask.json.JSONEncoder):
 
 
 mysql = MySQL()
-
+db= SQLAlchemy()
 
 def create_app():
     app = Flask(
@@ -36,19 +34,11 @@ def create_app():
     app.config.from_object(Config)
     app.json_encoder = MyJSONEncoder
 
-    # app.config['SQLALCHEMY_DATABASE_URI'] = 'sqlite:///db.sqlite3'
-    # app.config['SESSION_TYPE'] = 'sqlalchemy'
-    # app.config['SQLALCHEMY_TRACK_MODIFICATIONS'] = False  # quiet warning message
-
-    # db = SQLAlchemy(app)
-
-    # app.config['SESSION_SQLALCHEMY']=db
-    # sess = Session(app)
-    # db.init_app(app)
-    # db.create_all()
-
+    app.config['MYSQL_DATABASE_USER'] = str(Config.DatabaseConfig.get('MYSQL_DATABASE_USER'))
+    app.config['MYSQL_DATABASE_PASSWORD'] = str(Config.DatabaseConfig.get('MYSQL_DATABASE_PASSWORD'))
+    app.config['MYSQL_DATABASE_HOST'] = str(Config.DatabaseConfig.get('MYSQL_DATABASE_HOST'))
     mysql.init_app(app)
-
+   
     from app.controller import (
         admin, user
     )
@@ -56,4 +46,11 @@ def create_app():
     app.register_blueprint(admin.admin)
     app.register_blueprint(user.user)
 
+    app.config['SQLALCHEMY_TRACK_MODIFICATIONS'] = False
+    app.config['SQLALCHEMY_DATABASE_URI'] = 'sqlite:///settings.sqlite3'
+    
+    with app.app_context():
+        db.init_app(app) # Initialize SQLAlchemy with this app
+        db.create_all()
+    
     return app

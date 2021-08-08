@@ -1,20 +1,9 @@
 import pdfkit
 import platform
 import logging
-from flask import Flask, session, redirect, url_for
+from flask import session, redirect, url_for
 from functools import wraps
-from app.config import Config
-from flaskext.mysql import MySQL
-
-
-mysql = MySQL()
-
-app = Flask(__name__)
-
-app.config['MYSQL_DATABASE_USER'] = str(Config.DatabaseConfig.get('MYSQL_DATABASE_USER'))
-app.config['MYSQL_DATABASE_PASSWORD'] = str(Config.DatabaseConfig.get('MYSQL_DATABASE_PASSWORD'))
-app.config['MYSQL_DATABASE_HOST'] = str(Config.DatabaseConfig.get('MYSQL_DATABASE_HOST'))
-mysql.init_app(app)
+from app import mysql
 
 
 if platform.system().lower() == "linux":
@@ -36,14 +25,14 @@ def user_sess(f):
 
 
 def mysql_query(sql):
-    print(sql)
+    logging.warning(sql)
     connection = mysql.connect()
 
     cursor = connection.cursor()
     if sql.lower().strip().startswith('select'):
         connection.escape_string(sql)
         cursor.execute(sql)
-        logging.warning(sql)
+        logging.debug(sql)
         columns = [column[0].strip() for column in cursor.description]
         results = [dict(zip(columns, row)) for row in cursor.fetchall()]
         cursor.close()
@@ -51,7 +40,7 @@ def mysql_query(sql):
         return results
     else:
         cursor.execute(sql)
-        logging.warning(sql)
+        logging.debug(sql)
 
         mysql_query.last_row_id = cursor.lastrowid
 
