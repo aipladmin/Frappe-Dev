@@ -31,7 +31,7 @@ class Transactions:
         os_amt = charges * int(days)
         return str(os_amt)
 
-    def checkOutstanding(self, email=None):
+    def check_outstanding(self, email=None):
         if email is None:
             cos = mysql_query('''select * from lms.transactions inner join lms.members ON
             members.MID=transactions.MID inner join lms.inventory ON inventory.IID=transactions.IID inner join
@@ -57,11 +57,11 @@ class Transactions:
             [JSON]: Eligibility,holdCount,HoldData
         """
         email = self.email
-        elg = mysql_query("select auth from lms.members where Email_ID='{}'".format(email))
+        eligible = mysql_query("select auth from lms.members where Email_ID='{}'".format(email))
         holdCount = mysql_query('''select *,count(*) as holdCount from lms.members inner join lms.transactions ON
         members.MID = transactions.MID where members.Email_ID='{}';'''.format(email))
 
-        return {'eligible': elg[0]['auth'], 'holdCount': holdCount[0]['holdCount'], 'holdData': holdCount[0]}
+        return {'eligible': eligible[0]['auth'], 'holdCount': holdCount[0]['holdCount'], 'holdData': holdCount[0]}
 
 
 class InventoryManager:

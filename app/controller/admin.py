@@ -154,26 +154,26 @@ def bookings():
 @admin.route('/booking/ajax', methods=['GET', 'POST'])
 def booking_ajax():
     tranObj = Transactions()
-    OBJ = tranObj.checkOutstanding(email=request.form['UserID'])
+    OBJ = tranObj.check_outstanding(email=request.form['UserID'])
     return jsonify({'bookings': OBJ})
 
 
 @admin.route('/cos', methods=['GET', 'POST'])
 def cos():
     cosObj = Transactions(email='parikh.madhav1999@gmail.com')
-    return "render_template"+str(cosObj.checkOutstanding())
+    return "render_template"+str(cosObj.check_outstanding())
 
 
 @admin.route('/returnbookings', methods=['GET', 'POST'])
 def returnBooks():
     user = mysql_query("select * from lms.members")
     cosObj = Transactions()
-    gd = cosObj.checkOutstanding()
+    gd = cosObj.check_outstanding()
     if request.method == 'POST':
 
         if 'getData' in request.form:
             cosObj = Transactions()
-            gd = cosObj.checkOutstanding(email=request.form['gdEmail'])
+            gd = cosObj.check_outstanding(email=request.form['gdEmail'])
             return render_template('admin/returnBooks.html', user=user, gd=gd, enableAct="enableAct")
         elif 'gdReturns' in request.form:
             mysql_query("UPDATE lms.transactions SET status='returned' WHERE transactions.TID={}".format(
@@ -196,7 +196,7 @@ def returnBooks():
 def report():
     from collections import defaultdict
     tranObj = Transactions()
-    OBJ = tranObj.checkOutstanding()
+    OBJ = tranObj.check_outstanding()
     c = defaultdict(int)
     for d in OBJ:
         c[d['Full_Name'], d['Email_ID'], d['Mobile_No'], d['Auth']] += int(d['osAmount'])
