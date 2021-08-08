@@ -47,11 +47,13 @@ def user_records():
     return str(Settings.query.all())+str(idd)
 
 
-@admin.route('/settings', methods=['GET','POST'])
+@admin.route('/settings', methods=['GET', 'POST'])
 def settings():
-    return render_template('admin/settings.html',exsisting_settings = Settings.query.order_by(Settings.timestamp.desc()).first())
+    return render_template('admin/settings.html',
+                           exsisting_settings=Settings.query.order_by(Settings.timestamp.desc()).first())
 
-@admin.route('/settings-update',methods=['POST'])
+
+@admin.route('/settings-update', methods=['POST'])
 def settings_post():
     validityPeriod = request.form['validityPeriod']
     amountToCharge = request.form['amountToCharge']
@@ -88,6 +90,7 @@ def books_to_inv():
     api_caller(nof_books=nof_books, nof_requests=nof_requests, params=params)
     flash('Books Inserted Successfully', 'success')
     return redirect(url_for('admin.books'))
+
 
 @admin.route('/inventory', methods=['GET', 'POST'])
 def inventory():
