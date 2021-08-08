@@ -1,45 +1,33 @@
 """Data models."""
-from .controller import db
+from app import db
 
 
-class User(db.Model):
-    """Data model for user accounts."""
+class Settings(db.Model):
+    """Data model for Settings."""
 
-    __tablename__ = 'flasksqlalchemy-tutorial-users'
+    __tablename__ = 'settings'
     id = db.Column(
         db.Integer,
         primary_key=True
     )
-    username = db.Column(
-        db.String(64),
+    validity = db.Column(
+        db.Integer(),
         index=False,
-        unique=True,
+        unique=False,
         nullable=False
     )
-    email = db.Column(
-        db.String(80),
+    charges = db.Column(
+        db.Integer(),
         index=True,
-        unique=True,
+        unique=False,
         nullable=False
     )
-    created = db.Column(
+    timestamp = db.Column(
         db.DateTime,
-        index=False,
-        unique=False,
-        nullable=False
-    )
-    bio = db.Column(
-        db.Text,
-        index=False,
-        unique=False,
-        nullable=True
-    )
-    admin = db.Column(
-        db.Boolean,
         index=False,
         unique=False,
         nullable=False
     )
 
     def __repr__(self):
-        return '<User {}>'.format(self.username)
+        return '<User {}>'.format(self.id)

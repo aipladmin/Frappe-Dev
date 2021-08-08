@@ -8,17 +8,23 @@
 {% include './notifications.html' %}
 
 <div class="container-fluid">
-    <form method="POST" action="{{ url_for('admin.settings') }}">
+    <form method="POST" action="{{ url_for('admin.settings_post') }}">
         <div class="form-group row">
             <label for="validityPeriod" class="col-sm-2 col-form-label">Validity Period</label>
             <div class="col-sm-10">
             <input type="text" class="form-control col-sm-4" name="validityPeriod" id="validityPeriod">
+            <small id="passwordHelpBlock" class="form-text text-danger">
+                Enter Validity in term of days.
+            </small>
             </div>
         </div>
         <div class="form-group row">
             <label for="atbc" class="col-sm-2 col-form-label">Amount to be Charged</label>
             <div class="col-sm-10">
             <input type="text" class="form-control col-sm-4" name="amountToCharge" id="atbc">
+            <small id="passwordHelpBlock" class="form-text text-danger">
+                Enter Amount to be charged per day.
+            </small>
             </div>
         </div>
         <div class="form-group row">
@@ -27,5 +33,21 @@
             </div>
         </div>
         </form>
+</div>
+<div class="container-fluid">
+    <table class="table">
+        <thead class="thead-dark">
+            <tr>
+            <th scope="col">Validity</th>
+            <th scope="col">Charges</th>
+            </tr>
+        </thead>
+        <tbody>
+            <tr>
+            <td> {{ exsisting_settings.validity }}</td>
+            <td> {{ exsisting_settings.charges }}</td>
+            </tr>
+        </tbody>
+    </table>
 </div>
 {% endblock %}

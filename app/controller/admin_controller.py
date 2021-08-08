@@ -77,24 +77,27 @@ class InventoryManager:
 
 
 def api_caller(nof_books, nof_requests, params):
-    nobCeil = math.ceil(nof_requests)
-    d = []
-    for x in range(1, int(nobCeil)+1):
-        params['page'] = int(x)
-        params.pop('nob', None)
-        r = requests.get("https://frappe.io/api/method/frappe-library", params=params)
-        if r.status_code != 200:
-            return "API Error: " + r.status_code+"\n"+r.text
-        api_data = r.json()
-        d.extend(api_data['message'])
+    try:
+        nobCeil = math.ceil(nof_requests)
+        d = []
+        for x in range(1, int(nobCeil)+1):
+            params['page'] = int(x)
+            params.pop('nob', None)
+            r = requests.get("https://frappe.io/api/method/frappe-library", params=params)
+            if r.status_code != 200:
+                return "API Error: " + r.status_code+"\n"+r.text
+            api_data = r.json()
+            d.extend(api_data['message'])
 
-    UD = {'message': d}
-    iterData = int(len(UD['message']))
-    if int(iterData) > int(nof_books):
-        iterData = nof_books
-    my_data = Books(**UD)
-    my_data.BooksInsert(iterData=iterData)
-    return "api"
+        UD = {'message': d}
+        iterData = int(len(UD['message']))
+        if int(iterData) > int(nof_books):
+            iterData = nof_books
+        my_data = Books(**UD)
+        my_data.BooksInsert(iterData=iterData)
+    except Exception as e:
+        return str(e)
+
 
 
 @dataclass

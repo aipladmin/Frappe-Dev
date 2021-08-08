@@ -8,7 +8,8 @@ from flask import (Blueprint, flash, jsonify, make_response, redirect,
 
 from .admin_controller import InventoryManager, Transactions, api_caller
 from .controller import WKHTML_CONFIG, mysql_query
-
+from flask import current_app as app
+from .models import db, Settings
 
 matplotlib.use('Agg')
 
@@ -22,18 +23,47 @@ admin = Blueprint('admin', __name__, template_folder='templates', static_folder=
 #     session.pop('email', '')
 #     session.clear()
 
+@admin.route('/testing', methods=['GET'])
+def user_records():
+    """Create a user via query string parameters."""
+    username = "madhav"
+    email = "madhav"
+    if username and email:
+        existing_user = Settings.query.order_by(Settings.timestamp.desc()).first()
+        app.logger.info(existing_user.validity, str(existing_user.timestamp))
+        if existing_user:
+            return str(existing_user)+"DONE"
+    new_settings = Settings(
+            validity=30,
+            charges=30,
+            timestamp=datetime.now()
+        )  # Create an instance of the User class
+    db.session.add(new_settings)  # Adds new User record to database
+    db.session.commit()
+    idd = new_settings.id
+    data = Settings.query.all()
+    for x in data:
+        app.logger.info(x.validity)
+    return str(Settings.query.all())+str(idd)
+
+
 @admin.route('/settings', methods=['GET','POST'])
 def settings():
-    if request.method == 'POST':
-        validityPeriod = request.form['validityPeriod']
-        amountToCharge = request.form['amountToCharge']
-        mysql_query(''' INSERT INTO `lms`.`settings`
-                        (`Validity`,
-                        `Charges`,Timestamp)
-                        VALUES
-                        ({},{},'{}'); '''.format(validityPeriod, amountToCharge, datetime.now()))
-        return "Settings"
-    return render_template('admin/settings.html')
+    return render_template('admin/settings.html',exsisting_settings = Settings.query.order_by(Settings.timestamp.desc()).first())
+
+@admin.route('/settings-update',methods=['POST'])
+def settings_post():
+    validityPeriod = request.form['validityPeriod']
+    amountToCharge = request.form['amountToCharge']
+    new_settings = Settings(
+            validity=int(validityPeriod),
+            charges=int(amountToCharge),
+            timestamp=datetime.now()
+        )
+    db.session.add(new_settings)
+    db.session.commit()
+    flash("Settings Updated Successfully.","success")
+    return redirect(url_for('admin.settings'))
 
 
 @admin.route('/')
