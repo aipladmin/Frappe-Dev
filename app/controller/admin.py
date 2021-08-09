@@ -4,7 +4,7 @@ import matplotlib
 import pandas as pd
 import pdfkit
 from flask import (Blueprint, flash, jsonify, make_response, redirect,
-                   render_template, request, session, url_for)
+                   render_template, request, url_for)
 
 from .admin_controller import InventoryManager, Transactions, api_caller
 from .controller import WKHTML_CONFIG, mysql_query
@@ -64,7 +64,7 @@ def settings_post():
         )
     db.session.add(new_settings)
     db.session.commit()
-    flash("Settings Updated Successfully.","success")
+    flash("Settings Updated Successfully.", "success")
     return redirect(url_for('admin.settings'))
 
 
