@@ -23,6 +23,14 @@ admin = Blueprint('admin', __name__, template_folder='templates', static_folder=
 #     session.pop('email', '')
 #     session.clear()
 
+def get_settings():
+    settings = Settings.query.order_by(Settings.timestamp.desc()).first()
+    if settings:
+        return {"Status": 'Success', 'Validity': settings.validity, 'Charges': settings.charges}
+    else:
+        return {"Status": 'Failure', 'Message': 'No Records Found!'}
+
+
 @admin.route('/testing', methods=['GET'])
 def user_records():
     """Create a user via query string parameters."""
@@ -30,7 +38,7 @@ def user_records():
     email = "madhav"
     if username and email:
         existing_user = Settings.query.order_by(Settings.timestamp.desc()).first()
-        app.logger.info(existing_user.validity, str(existing_user.timestamp))
+        app.logger.info(existing_user.validity)
         if existing_user:
             return str(existing_user)+"DONE"
     new_settings = Settings(

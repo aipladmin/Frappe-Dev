@@ -1,6 +1,7 @@
 import pdfkit
 import platform
 import logging
+import traceback
 from flask import session, redirect, url_for
 from functools import wraps
 from app import mysql
