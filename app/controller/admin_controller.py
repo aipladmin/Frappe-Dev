@@ -9,7 +9,8 @@ from .controller import mysql_query
 
 def settings_data():
     from .admin import get_settings
-    return get_settings()
+    settings = get_settings()
+    return settings
 
 
 class Transactions:
@@ -19,13 +20,13 @@ class Transactions:
     @staticmethod
     def os_amt_validator(days):
         data = settings_data()
-        print(data)
         if data['Status'] == 'Success':
             charges = int(data['Charges'])
-        os_amt = charges * int(days)
+            os_amt = charges * int(days)
         return str(os_amt)
 
     def check_outstanding(self, email=None):
+        data = settings_data()
         if email is None:
             cos = mysql_query('''select * from lms.transactions inner join lms.members ON
             members.MID=transactions.MID inner join lms.inventory ON inventory.IID=transactions.IID inner join
@@ -39,6 +40,9 @@ class Transactions:
             x['osTimePeriod'] = (datetime.now().date()-x['Issued'].date())
             x['osTimePeriod'] = str(x['osTimePeriod'].days)
             day = (datetime.now().date()-x['Issued'].date()).days
+            day = day-int(data['Validity'])
+            if day < 0:
+                day = 0
             x['osAmount'] = self.os_amt_validator(days=day)
         return cos
 

@@ -51,7 +51,7 @@ def create_app():
     app.config['SQLALCHEMY_DATABASE_URI'] = 'sqlite:///settings.sqlite3'
 
     with app.app_context():
-        db.init_app(app) # Initialize SQLAlchemy with this app
+        db.init_app(app)  # Initialize SQLAlchemy with this app
         db.create_all()
 
     return app
