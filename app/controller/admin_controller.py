@@ -9,8 +9,7 @@ from .controller import mysql_query
 
 def settings_data():
     from .admin import get_settings
-    settings = get_settings()
-    return settings
+    return get_settings()
 
 
 class Transactions:
@@ -40,6 +39,7 @@ class Transactions:
             x['osTimePeriod'] = (datetime.now().date()-x['Issued'].date())
             x['osTimePeriod'] = str(x['osTimePeriod'].days)
             day = (datetime.now().date()-x['Issued'].date()).days
+            #? FREE TRIAL
             day = day-int(data['Validity'])
             if day < 0:
                 day = 0

@@ -65,9 +65,11 @@ def settings():
 def settings_post():
     validityPeriod = request.form['validityPeriod']
     amountToCharge = request.form['amountToCharge']
+    threshold = request.form['threshold']
     new_settings = Settings(
             validity=int(validityPeriod),
             charges=int(amountToCharge),
+            limit=int(threshold),
             timestamp=datetime.now()
         )
     db.session.add(new_settings)
@@ -161,9 +163,9 @@ def bookings():
 
 @admin.route('/booking/ajax', methods=['GET', 'POST'])
 def booking_ajax():
-    tranObj = Transactions()
-    OBJ = tranObj.check_outstanding(email=request.form['UserID'])
-    return jsonify({'bookings': OBJ})
+    outstanding_data = Transactions().check_outstanding(email=request.form['UserID'])
+    charges = Settings.query.order_by(Settings.timestamp.desc()).first()
+    return jsonify({'bookings': outstanding_data, 'charges': int(charges.charges)})
 
 
 @admin.route('/cos', methods=['GET', 'POST'])

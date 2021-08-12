@@ -22,6 +22,13 @@ class Settings(db.Model):
         unique=False,
         nullable=False
     )
+    limit = db.Column(
+        db.Integer(),
+        index=False,
+        unique=False,
+        nullable=False,
+        default=500
+    )
     timestamp = db.Column(
         db.DateTime,
         index=False,
