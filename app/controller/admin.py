@@ -4,7 +4,7 @@ import matplotlib
 import pandas as pd
 import pdfkit
 from flask import (Blueprint, flash, jsonify, make_response, redirect,
-                   render_template, request, session, url_for)
+                   render_template, request, url_for)
 
 from .admin_controller import InventoryManager, Transactions, api_caller
 from .controller import WKHTML_CONFIG, mysql_query
@@ -23,6 +23,14 @@ admin = Blueprint('admin', __name__, template_folder='templates', static_folder=
 #     session.pop('email', '')
 #     session.clear()
 
+def get_settings():
+    settings = Settings.query.order_by(Settings.timestamp.desc()).first()
+    if settings:
+        return {"Status": 'Success', 'Validity': settings.validity, 'Charges': settings.charges}
+    else:
+        return {"Status": 'Failure', 'Message': 'No Records Found!'}
+
+
 @admin.route('/testing', methods=['GET'])
 def user_records():
     """Create a user via query string parameters."""
@@ -30,7 +38,7 @@ def user_records():
     email = "madhav"
     if username and email:
         existing_user = Settings.query.order_by(Settings.timestamp.desc()).first()
-        app.logger.info(existing_user.validity, str(existing_user.timestamp))
+        app.logger.info(existing_user.validity)
         if existing_user:
             return str(existing_user)+"DONE"
     new_settings = Settings(
@@ -57,14 +65,16 @@ def settings():
 def settings_post():
     validityPeriod = request.form['validityPeriod']
     amountToCharge = request.form['amountToCharge']
+    threshold = request.form['threshold']
     new_settings = Settings(
             validity=int(validityPeriod),
             charges=int(amountToCharge),
+            limit=int(threshold),
             timestamp=datetime.now()
         )
     db.session.add(new_settings)
     db.session.commit()
-    flash("Settings Updated Successfully.","success")
+    flash("Settings Updated Successfully.", "success")
     return redirect(url_for('admin.settings'))
 
 
@@ -101,9 +111,9 @@ def inventory():
         flash("Inventory Updated.", "success")
         return redirect(url_for('admin.inventory'))
 
-    bookInv = InventoryManager()
-    dt = bookInv.inventory_merger()
-    return render_template('admin/inventory.html', data=dt['books_inventory'])
+    inventory_obj = InventoryManager()
+    inventory = inventory_obj.inventory_merger()
+    return render_template('admin/inventory.html', data=inventory['books_inventory'])
 
 
 @admin.route('/members', methods=['GET', 'POST'])
@@ -144,6 +154,7 @@ def bookings():
         mysql_query('INSERT into lms.transactions(IID,MID) values({},{})'.format(request.form['books'], MID))
         flash("Book Issued.", "success")
         return redirect(url_for('admin.bookings'))
+
     user = mysql_query("select * from lms.members where Auth != 'Terminated';")
     books = mysql_query('''select IID,title,authors,publisher from lms.books inner join
     lms.inventory ON inventory.BID=books.BID where inventory.IID
@@ -153,43 +164,46 @@ def bookings():
 
 @admin.route('/booking/ajax', methods=['GET', 'POST'])
 def booking_ajax():
-    tranObj = Transactions()
-    OBJ = tranObj.check_outstanding(email=request.form['UserID'])
-    return jsonify({'bookings': OBJ})
+    outstanding_data = Transactions().check_outstanding(email=request.form['UserID'])
+    charges = Settings.query.order_by(Settings.timestamp.desc()).first()
+    return jsonify({'bookings': outstanding_data, 'charges': int(charges.charges)})
 
 
-@admin.route('/cos', methods=['GET', 'POST'])
-def cos():
-    cosObj = Transactions(email='parikh.madhav1999@gmail.com')
-    return "render_template"+str(cosObj.check_outstanding())
+# @admin.route('/cos', methods=['GET', 'POST'])
+# def cos():
+#     cosObj = Transactions(email='parikh.madhav1999@gmail.com')
+#     return "render_template"+str(cosObj.check_outstanding())
 
 
 @admin.route('/returnbookings', methods=['GET', 'POST'])
 def returnBooks():
     user = mysql_query("select * from lms.members")
-    cosObj = Transactions()
-    gd = cosObj.check_outstanding()
-    if request.method == 'POST':
-
-        if 'getData' in request.form:
-            cosObj = Transactions()
-            gd = cosObj.check_outstanding(email=request.form['gdEmail'])
-            return render_template('admin/returnBooks.html', user=user, gd=gd, enableAct="enableAct")
-        elif 'gdReturns' in request.form:
-            mysql_query("UPDATE lms.transactions SET status='returned' WHERE transactions.TID={}".format(
-                request.form['gdReturns']))
-            return render_template('admin/returnBooks.html', gd=gd)
-        elif 'gdAuth' in request.form:
-            authStatus = mysql_query('select Auth from lms.members where MID={};'.format(request.form['gdAuth']))
-            if authStatus[0]['Auth'] == "Activated":
-                mysql_query("Update lms.members SET Auth='{}' WHERE MID={};".format(
-                    "Deactivated", request.form['gdAuth']))
-            else:
-                mysql_query("Update lms.members SET Auth='{}' WHERE MID={};".format(
-                    "Activated", request.form['gdAuth']))
-            return redirect(url_for('admin.returnBooks'))
-
+    gd = Transactions().check_outstanding()
     return render_template('admin/returnBooks.html', user=user, gd=gd, enableAct="enableAct")
+
+
+@admin.route('/post-returnBooks', methods=['POST'])
+def returnBooks_post():
+    user = mysql_query("select * from lms.members")
+    gd = Transactions().check_outstanding()
+    if 'getData' in request.form:
+        transaction_object = Transactions()
+        gd = transaction_object.check_outstanding(email=request.form['gdEmail'])
+        return render_template('admin/returnBooks.html', user=user, gd=gd, enableAct="enableAct")
+    elif 'gdReturns' in request.form:
+        mysql_query("UPDATE lms.transactions SET status='returned' WHERE transactions.TID={}".format(
+            request.form['gdReturns']))
+        return render_template('admin/returnBooks.html', gd=gd)
+    elif 'gdAuth' in request.form:
+        authStatus = mysql_query('select Auth from lms.members where MID={};'.format(request.form['gdAuth']))
+        if authStatus[0]['Auth'] == "Activated":
+            mysql_query("Update lms.members SET Auth='{}' WHERE MID={};".format(
+                "Deactivated", request.form['gdAuth']))
+        else:
+            mysql_query("Update lms.members SET Auth='{}' WHERE MID={};".format(
+                "Activated", request.form['gdAuth']))
+        return redirect(url_for('admin.returnBooks'))
+    return redirect(url_for('admin.returnBooks'))
 
 
 @admin.route('/report', methods=['GET', 'POST'])

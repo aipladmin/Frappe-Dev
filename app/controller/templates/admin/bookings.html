@@ -21,15 +21,15 @@
         else{
                // console.log("DATA");
               var opts = $.parseJSON(JSON.stringify(result));
-              console.log(opts);
               $('#myTable').empty();
-             
 
               if(opts['bookings'].length == 0){
                   event_data += '<tr>';
                   event_data += '<td class="text-warning">'+"No Books Issued. "+'</td>';
                   event_data += '</tr>';
               }else{
+                var charges = parseInt(opts['charges']); 
+                // console.log(charges);
                 var opts = opts['bookings'];
                 var sum = 0;
                 var event_data ='';
@@ -44,7 +44,7 @@
                     event_data += '</tr>';
                    }
                 }
-               if(parseInt(sum) >=500){
+               if(parseInt(sum) >=charges){
                    $('#fisubmit').attr("disabled");
                }
                else{
