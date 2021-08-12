@@ -40,7 +40,7 @@ class Transactions:
             x['osTimePeriod'] = str(x['osTimePeriod'].days)
             day = (datetime.now().date()-x['Issued'].date()).days
             #? FREE TRIAL
-            day = day-int(data['Validity'])
+            day = day - int(data['Validity'])
             if day < 0:
                 day = 0
             x['osAmount'] = self.os_amt_validator(days=day)
