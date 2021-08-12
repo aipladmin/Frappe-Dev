@@ -14,7 +14,7 @@
             <div class="col-sm-10">
             <input type="text" class="form-control col-sm-4" name="validityPeriod" id="validityPeriod" value="0">
             <small id="passwordHelpBlock" class="form-text text-danger">
-                Enter Validity in term of days.
+                Enter validity in term of days.
             </small>
             </div>
         </div>
@@ -23,7 +23,16 @@
             <div class="col-sm-10">
             <input type="text" class="form-control col-sm-4" name="amountToCharge" id="atbc" value="0">
             <small id="passwordHelpBlock" class="form-text text-danger">
-                Enter Amount to be charged per day.
+                Enter amount to be charged per day.
+            </small>
+            </div>
+        </div>
+        <div class="form-group row">
+            <label for="atbc" class="col-sm-2 col-form-label">Threshold</label>
+            <div class="col-sm-10">
+            <input type="text" class="form-control col-sm-4" name="threshold" id="atbc" value="500">
+            <small id="passwordHelpBlock" class="form-text text-danger">
+                Enter amount from where user cant issue books.
             </small>
             </div>
         </div>
@@ -38,14 +47,16 @@
     <table class="table">
         <thead class="thead-dark">
             <tr>
-            <th scope="col">Validity</th>
-            <th scope="col">Charges</th>
+                <th scope="col">Validity</th>
+                <th scope="col">Charges</th>
+                <th scope="col">Limit</th>
             </tr>
         </thead>
         <tbody>
             <tr>
             <td> {{ exsisting_settings.validity }}</td>
             <td> {{ exsisting_settings.charges }}</td>
+            <td> {{ exsisting_settings.limit }}</td>
             </tr>
         </tbody>
     </table>
