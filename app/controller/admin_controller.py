@@ -82,6 +82,7 @@ class InventoryManager:
                 if str(y.get('BID')) == str(x.get('BID')):
                     x['inventory'] = y
             lst.append(x)
+        print(lst)
         return {'books': books, "inventory": inventoryDt, 'books_inventory': lst}
 
 
@@ -104,6 +105,10 @@ def api_caller(nof_books, nof_requests, params):
             iterData = nof_books
         my_data = Books(**UD)
         my_data.BooksInsert(iterData=iterData)
+    except requests.exceptions.Timeout as e:
+        return "Conbnection timed out."
+    except requests.exceptions.RequestException as e:
+        raise str("System Down Please try againlater")
     except Exception as e:
         return str(e)
 
