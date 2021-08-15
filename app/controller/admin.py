@@ -108,6 +108,7 @@ def inventory():
     inventory = inventory_obj.inventory_merger()
     return render_template('admin/inventory.html', data=inventory['books_inventory'])
 
+
 @admin.route('/inventory-operations', methods=['POST'])
 def inventory_post():
     for _ in range(int(request.form['inventory'])):
