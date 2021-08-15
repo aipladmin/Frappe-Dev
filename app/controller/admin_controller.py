@@ -1,3 +1,4 @@
+import logging
 import math
 from dataclasses import dataclass
 from datetime import datetime
@@ -76,9 +77,17 @@ class InventoryManager:
         '''
         books = mysql_query('Select books.BID,books.bookID,title,authors,publisher,isbn from lms.books')
         inventoryDt = mysql_query("Select count(*) as 'CInt',BID from lms.inventory group by BID ")
+        complete_data = mysql_query(''' SELECT
+                        COUNT(transactions.Status) as 'Status Count',IFNULL(Status,'Stocked') as 'Status',inventory.BID
+            FROM
+                lms.inventory
+                    left join
+                lms.transactions ON inventory.IID = transactions.IID
+            GROUP BY transactions.Status , inventory.BID; ''')
+        logging.warning(complete_data)
         lst = []
         for x in books:
-            for y in inventoryDt:
+            for y in complete_data:
                 if str(y.get('BID')) == str(x.get('BID')):
                     x['inventory'] = y
             lst.append(x)
