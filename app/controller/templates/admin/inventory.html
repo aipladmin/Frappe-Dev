@@ -30,17 +30,16 @@
   <tbody>
     
     {% for x in data %}
-    <form method="POST" action="{{ url_for('admin.inventory') }}">
+    <form method="POST" action="{{ url_for('admin.inventory_post') }}">
         <tr>
             <td>{{ x.bookID }} </td>
             <td>{{ x.title }} </td>
             <td>{{ x.authors }}</td>
             <td>{{ x.isbn }}</td>
             <td>{{ x.publisher }}</td>
-            <td>{{ x.inventory.CInt }}</td>
-            <td> <!-- Button to Open the Modal -->
+            <td>
               <button type="button" class="btn btn-primary" data-toggle="modal" data-target="#BID{{ x.bookID }}">
-                OPEN
+                View Stock
               </button>
               <!-- The Modal -->
               <div class="modal" id="BID{{ x.bookID }}">
@@ -79,10 +78,17 @@
               </div>
             </td>
             <td>
-                <input type="text" class="form-control col-sm-6" name="inventory" />
+              {% for items in x.inventory %}
+                {% if items.stock == 'In Stock' %}
+                  <input type="text" class="form-control col-sm-6" name="inventory"/>
+                {% endif %}
+              {% endfor %}
             </td>
             <td>
-                <button type="submit" class="btn btn-success" name="update" value="{{ x.BID }}">Update</button>
+                <button onclick="update_validation()" type="submit" class="btn btn-success" name="update" value="{{ x.BID }}">Update</button>
+            </td>
+            <td>
+                <button onclick="delete_validation()" type="submit" class="btn btn-danger" name="delete" value="{{ x.BID }}">Delete</button>
             </td>
         </tr>
     </form>        
@@ -92,5 +98,14 @@
   </tbody>
 </table>
 </div>
-
+<script type="text/javascript">
+function update_validation() {
+  var info = "This will increase the stock count of the book.\n If you want to decrease the count, please select delete button.\n Are you sure you want to do this?";
+  alert(info);
+}
+function delete_validation() {
+  var info = "This will decrease the stock count of the book.\n If you want to increase the count, please select update button.\n Are you sure you want to do this?";
+  alert(info);
+}
+</script>
 {% endblock %}
