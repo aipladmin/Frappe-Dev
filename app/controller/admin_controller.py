@@ -39,7 +39,8 @@ class Transactions:
             x['osTimePeriod'] = (datetime.now().date()-x['Issued'].date())
             x['osTimePeriod'] = str(x['osTimePeriod'].days)
             day = (datetime.now().date()-x['Issued'].date()).days
-            #? FREE TRIAL
+
+            # FREE TRIAL CODE
             day = day - int(data['Validity'])
             if day < 0:
                 day = 0
@@ -75,14 +76,24 @@ class InventoryManager:
 
         '''
         books = mysql_query('Select books.BID,books.bookID,title,authors,publisher,isbn from lms.books')
-        inventoryDt = mysql_query("Select count(*) as 'CInt',BID from lms.inventory group by BID ")
+
+        complete_data = mysql_query(''' SELECT
+                                        COUNT(inventory.BID) as 'stock_count',IFNULL(Status,'In Stock') as 'stock',
+                                        inventory.BID
+                                    FROM
+                                        lms.inventory
+                                            left join
+                                        lms.transactions ON inventory.IID = transactions.IID
+                                    GROUP BY transactions.Status , inventory.BID; ''')
+
         lst = []
         for x in books:
-            for y in inventoryDt:
+            x['inventory'] = []
+            for y in complete_data:
                 if str(y.get('BID')) == str(x.get('BID')):
-                    x['inventory'] = y
+                    x['inventory'].append(y)
             lst.append(x)
-        return {'books': books, "inventory": inventoryDt, 'books_inventory': lst}
+        return {'books': books, "inventory": complete_data, 'books_inventory': lst}
 
 
 def api_caller(nof_books, nof_requests, params):
@@ -104,6 +115,10 @@ def api_caller(nof_books, nof_requests, params):
             iterData = nof_books
         my_data = Books(**UD)
         my_data.BooksInsert(iterData=iterData)
+    except requests.exceptions.Timeout as e:
+        return "Connection timed out."+"\n"+str(e)
+    except requests.exceptions.RequestException as e:
+        raise str("System Down Please try againlater")+"\n"+str(e)
     except Exception as e:
         return str(e)
 

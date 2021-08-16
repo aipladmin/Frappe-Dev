@@ -102,18 +102,36 @@ def books_to_inv():
     return redirect(url_for('admin.books'))
 
 
-@admin.route('/inventory', methods=['GET', 'POST'])
+@admin.route('/inventory', methods=['GET'])
 def inventory():
-    if request.method == "POST":
-        for _ in range(int(request.form['inventory'])):
-            mysql_query("INSERT INTO lms.inventory(BID) values({});".format(request.form['IID']))
-
-        flash("Inventory Updated.", "success")
-        return redirect(url_for('admin.inventory'))
-
     inventory_obj = InventoryManager()
     inventory = inventory_obj.inventory_merger()
     return render_template('admin/inventory.html', data=inventory['books_inventory'])
+
+
+@admin.route('/inventory-operations', methods=['POST'])
+def inventory_post():
+
+    if 'update' in request.form:
+        for _ in range(int(request.form['inventory'])):
+            mysql_query("INSERT INTO lms.inventory(BID) values({});".format(request.form['update']))
+
+    if 'delete' in request.form:
+        books_in_stock = mysql_query('''SELECT
+                                        inventory.IID
+                                    FROM
+                                        lms.inventory
+                                            INNER JOIN
+                                        lms.books ON books.BID = inventory.BID
+                                            LEFT JOIN
+                                        lms.transactions ON transactions.IID = inventory.IID
+                                    WHERE
+                                        status IS NULL AND books.BID = {}
+                                        limit {};'''.format(request.form['delete'], request.form['inventory']))
+        for x in books_in_stock:
+            mysql_query("DELETE FROM lms.inventory WHERE IID={};".format(x['IID']))
+    flash("Inventory Updated.", "success")
+    return redirect(url_for('admin.inventory'))
 
 
 @admin.route('/members', methods=['GET', 'POST'])
