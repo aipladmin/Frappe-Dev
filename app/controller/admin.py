@@ -260,6 +260,7 @@ def returnBooks_post():
 def popular_book_report():
     data = InventoryManager.inventory_merger()
     data = data['books_inventory']
+    print(data)
     return render_template('admin/popularBookReport.html', data=data)
 
 

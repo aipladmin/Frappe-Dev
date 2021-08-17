@@ -23,7 +23,37 @@
 {% include 'notifications.html' %}
 
 <div class="container-fluid">
-  
+  <table class="table table-striped">
+     <thead>
+      <tr>
+        <th></th>
+        <th></th>
+        <th></th>
+      </tr>
+    </thead>
+    <tbody>
+      {% for x in data %}
+      <tr>
+          <td>{{ x.title }}</td>
+          <td>{{ x.authors }}</td>
+          <td>{{ x.publisher }}</td>
+          {% for itms in x.inventory %}
+            {% if itms['stock'] == "In Stock" %}
+              <td>{{ itms['stock'] }}</td>
+            {% endif %}
+            {% if itms['stock'] == "issued"%}
+              <td>
+                {{ itms['stock_count']|default(0,true) }}
+                  {% else %}
+                {{ "0" }}
+              </td>
+              
+            {% endif %}
+          {% endfor %}
+      </tr>
+      {% endfor %}
+    </tbody>
+  </table>
 </div>
    
 
