@@ -45,8 +45,8 @@ def user_records():
             validity=30,
             charges=30,
             timestamp=datetime.now()
-        )  # Create an instance of the User class
-    db.session.add(new_settings)  # Adds new User record to database
+        )  # Create an instance of the settings class
+    db.session.add(new_settings)  # Adds new settings record to database
     db.session.commit()
     idd = new_settings.id
     data = Settings.query.all()
@@ -193,11 +193,11 @@ def booking_ajax():
 #     return "render_template"+str(cosObj.check_outstanding())
 
 
-@admin.route('/returnbookings', methods=['GET', 'POST'])
-def returnBooks():
+@admin.route('/returnbookings', methods=['GET'])
+def return_books():
     user = mysql_query("select * from lms.members")
-    gd = Transactions().check_outstanding()
-    return render_template('admin/returnBooks.html', user=user, gd=gd, enableAct="enableAct")
+    member_data = Transactions().check_outstanding()
+    return render_template('admin/returnBooks.html', user=user, gd=member_data, enableAct="enableAct")
 
 
 @admin.route('/post-returnBooks', methods=['POST'])
@@ -234,36 +234,19 @@ def popular_book_report():
         status = set()
         for items in x['inventory']:
             status.add(str(items['stock']))
-        a = complete_list_of_set - status
-        if len(a) > 0:
-            for ind in a:
+        non_exsistant_set = complete_list_of_set - status
+        if len(non_exsistant_set) > 0:
+            for ind in non_exsistant_set:
                 updated_dict = {'stock_count': 0, 'stock': str(ind), 'BID': x['BID']}
                 x['inventory'].append(updated_dict)
 
     return render_template('admin/popularBookReport.html', data=data)
 
 
-@admin.route('/report1', methods=['GET', 'POST'])
-def report1():
-    data = mysql_query('''SELECT
-                        books.title,
-                        books.authors,
-                        books.publisher,
-                        books.isbn,
-                        COUNT(CASE Status
-                            WHEN 'issued' THEN 1
-                            ELSE NULL
-                        END) AS 'Issued',
-                        COUNT(CASE Status
-                            WHEN 'returned' THEN 1
-                            ELSE NULL
-                        END) AS 'Returned'
-                    FROM
-                        lms.transactions
-                            INNER JOIN
-                        lms.inventory ON inventory.IID = transactions.IID
-                            INNER JOIN
-                        lms.books ON books.BID = inventory.BID;''')
+@admin.route('/highest_paying_customer', methods=['GET', 'POST'])
+def highest_paying_customer():
+    member_data = Transactions().check_outstanding()
+
     if request.method == 'POST':
         rendered = render_template('admin/report1_pdf.html', data=data,
                                    DG=datetime.today().strftime('%d-%m-%Y %H:%M:%S'))
@@ -276,4 +259,4 @@ def report1():
             response.headers['Content-Disposition'] = 'attachment; filename="report1.pdf"'
         return response
 
-    return render_template('admin/report1.html', data=data)
+    return render_template('admin/report1.html', data=member_data)
