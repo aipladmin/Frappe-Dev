@@ -119,7 +119,7 @@ def members():
     return render_template('admin/members.html')
 
 
-@admin.route('/member-detailedInfo', methods=['GET')
+@admin.route('/member-detailedInfo', methods=['GET'])
 def member_detailed_info():
     return render_template('admin/member_detailed_info.html', data=mysql_query("select * from lms.members"))
 
