@@ -30,7 +30,7 @@ def get_settings():
         return {"Status": 'Failure', 'Message': 'No Records Found!'}
 
 
-@admin.route('/settings', methods=['GET', 'POST'])
+@admin.route('/settings', methods=['GET'])
 def settings():
     return render_template('admin/settings.html',
                            exsisting_settings=Settings.query.order_by(Settings.timestamp.desc()).first())
@@ -86,7 +86,6 @@ def inventory():
 
 @admin.route('/inventory-operations', methods=['POST'])
 def inventory_post():
-
     if 'update' in request.form:
         for _ in range(int(request.form['inventory'])):
             mysql_query("INSERT INTO lms.inventory(BID) values({});".format(request.form['update']))
