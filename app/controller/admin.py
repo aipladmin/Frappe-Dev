@@ -8,7 +8,6 @@ from flask import (Blueprint, flash, jsonify, make_response, redirect,
 
 from .admin_controller import InventoryManager, Transactions, api_caller
 from .controller import WKHTML_CONFIG, mysql_query
-from flask import current_app as app
 from .models import db, Settings
 
 matplotlib.use('Agg')
@@ -29,30 +28,6 @@ def get_settings():
         return {"Status": 'Success', 'Validity': settings.validity, 'Charges': settings.charges}
     else:
         return {"Status": 'Failure', 'Message': 'No Records Found!'}
-
-
-@admin.route('/testing', methods=['GET'])
-def user_records():
-    """Create a user via query string parameters."""
-    username = "madhav"
-    email = "madhav"
-    if username and email:
-        existing_user = Settings.query.order_by(Settings.timestamp.desc()).first()
-        app.logger.info(existing_user.validity)
-        if existing_user:
-            return str(existing_user)+"DONE"
-    new_settings = Settings(
-            validity=30,
-            charges=30,
-            timestamp=datetime.now()
-        )  # Create an instance of the settings class
-    db.session.add(new_settings)  # Adds new settings record to database
-    db.session.commit()
-    idd = new_settings.id
-    data = Settings.query.all()
-    for x in data:
-        app.logger.info(x.validity)
-    return str(Settings.query.all())+str(idd)
 
 
 @admin.route('/settings', methods=['GET', 'POST'])
@@ -166,19 +141,19 @@ def memberDetailedInfo():
 
 @admin.route('/booking', methods=['GET', 'POST'])
 def bookings():
-    if request.method == 'POST':
-        MID = mysql_query("select MID from lms.members where Email_ID='{}';".format(request.form['User']))
-        MID = MID[0]['MID']
-        mysql_query('INSERT into lms.transactions(IID,MID) values({},{})'.format(request.form['books'], MID))
-        flash("Book Issued.", "success")
-        return redirect(url_for('admin.bookings'))
-
     user = mysql_query("select * from lms.members where Auth != 'Terminated';")
     books = mysql_query('''select IID,title,authors,publisher from lms.books inner join
     lms.inventory ON inventory.BID=books.BID where inventory.IID
     NOT IN (select IID from lms.transactions where Status='issued');''')
     return render_template('admin/bookings.html', User=user, books=books)
 
+@admin.route('/bookings/update', methods=['POST'])
+def bookings_post():
+    MID = mysql_query("select MID from lms.members where Email_ID='{}';".format(request.form['User']))
+    MID = MID[0]['MID']
+    mysql_query('INSERT into lms.transactions(IID,MID) values({},{})'.format(request.form['books'], MID))
+    flash("Book Issued.", "success")
+    return redirect(url_for('admin.bookings'))
 
 @admin.route('/booking/ajax', methods=['GET', 'POST'])
 def booking_ajax():
@@ -218,7 +193,7 @@ def returnBooks_post():
     return redirect(url_for('admin.returnBooks'))
 
 
-@admin.route('/popular-book-report', methods=['GET', 'POST'])
+@admin.route('/popular-book-report', methods=['GET'])
 def popular_book_report():
     data = InventoryManager.inventory_merger()
 
@@ -253,4 +228,4 @@ def highest_paying_customer():
             response.headers['Content-Disposition'] = 'attachment; filename="report1.pdf"'
         return response
 
-    return render_template('admin/report1.html', data=member_data)
+    return render_template('admin/highest_paying_customer.html', data=member_data)
