@@ -119,10 +119,14 @@ def members():
     return render_template('admin/members.html')
 
 
-@admin.route('/member-detailedInfo', methods=['GET', 'POST'])
-def memberDetailedInfo():
-    if request.method == 'POST':
-        mysql_query('''UPDATE `lms`.`members`
+@admin.route('/member-detailedInfo', methods=['GET')
+def member_detailed_info():
+    return render_template('admin/member_detailed_info.html', data=mysql_query("select * from lms.members"))
+
+
+@admin.route('/member-detailed-info/update', methods=['POST'])
+def member_detailed_info_post():
+    mysql_query('''UPDATE `lms`.`members`
                     SET
                     `Full_Name` = '{}',
                     `Email_ID` = '{}',
@@ -132,20 +136,19 @@ def memberDetailedInfo():
                     '''.format(
                         request.form['Full_Name'], request.form['Email_ID'], request.form['Mobile_No'],
                         request.form['Auth'], request.form['MID']))
-        flash("Member Detailed Updated.", "success")
-        return redirect(url_for('admin.memberDetailedInfo'))
 
-    data = mysql_query("select * from lms.members")
-    return render_template('admin/member_detailed_info.html', data=data)
+    flash("Member Detailed Updated.", "success")
+    return redirect(url_for('admin.member_detailed_info()'))
 
 
-@admin.route('/booking', methods=['GET', 'POST'])
+@admin.route('/booking', methods=['GET'])
 def bookings():
     user = mysql_query("select * from lms.members where Auth != 'Terminated';")
     books = mysql_query('''select IID,title,authors,publisher from lms.books inner join
     lms.inventory ON inventory.BID=books.BID where inventory.IID
     NOT IN (select IID from lms.transactions where Status='issued');''')
     return render_template('admin/bookings.html', User=user, books=books)
+
 
 @admin.route('/bookings/update', methods=['POST'])
 def bookings_post():
@@ -154,6 +157,7 @@ def bookings_post():
     mysql_query('INSERT into lms.transactions(IID,MID) values({},{})'.format(request.form['books'], MID))
     flash("Book Issued.", "success")
     return redirect(url_for('admin.bookings'))
+
 
 @admin.route('/booking/ajax', methods=['GET', 'POST'])
 def booking_ajax():

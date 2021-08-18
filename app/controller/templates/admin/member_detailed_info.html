@@ -27,7 +27,7 @@
   <tbody>
     
     {% for x in data %}
-    <form method="POST" action="{{ url_for('admin.memberDetailedInfo') }}">
+    <form method="POST" action="{{ url_for('admin.member_detailed_info_post') }}">
         <tr>
             <td>
                 <input type="text" value="{{ x.Full_Name }} " class="form-control" name="Full_Name">
