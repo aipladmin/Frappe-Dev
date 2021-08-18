@@ -234,7 +234,6 @@ def popular_book_report():
         status = set()
         for items in x['inventory']:
             status.add(str(items['stock']))
-        # print(items, status)
         a = complete_list_of_set - status
         if len(a) > 0:
             for ind in a:
