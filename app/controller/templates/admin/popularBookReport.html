@@ -26,9 +26,11 @@
   <table class="table table-striped">
      <thead>
       <tr>
-        <th></th>
-        <th></th>
-        <th></th>
+        <th>Title</th>
+        <th>Authors</th>
+        <th>Publishers</th>
+        <th>In Stock</th>
+        <th>Issued</th>
       </tr>
     </thead>
     <tbody>
@@ -37,17 +39,18 @@
           <td>{{ x.title }}</td>
           <td>{{ x.authors }}</td>
           <td>{{ x.publisher }}</td>
-          {% for itms in x.inventory %}
-            {% if itms['stock'] == "In Stock" %}
-              <td>{{ itms['stock'] }}</td>
+          {% set ns = namespace(total=0) %}
+          {% for items in x.inventory %}
+            {% if items['stock'] == "In Stock" or items['stock'] == "returned"   %}
+              {% set ns.total = ns.total|int + items['stock_count']|int %}
             {% endif %}
-            {% if itms['stock'] == "issued"%}
-              <td>
-                {{ itms['stock_count']|default(0,true) }}
-                  {% else %}
-                {{ "0" }}
-              </td>
-              
+          {% endfor %}
+
+            <td>{{ns.total }}</td>
+
+          {% for items in x.inventory %}
+            {% if items['stock'] == "issued"   %}
+              <td>{{ items.stock_count }}</td>
             {% endif %}
           {% endfor %}
       </tr>

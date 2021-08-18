@@ -259,8 +259,20 @@ def returnBooks_post():
 @admin.route('/popular-book-report', methods=['GET', 'POST'])
 def popular_book_report():
     data = InventoryManager.inventory_merger()
+
+    complete_list_of_set = {'In Stock', 'returned', 'issued'}
     data = data['books_inventory']
-    print(data)
+    for x in data:
+        status = set()
+        for items in x['inventory']:
+            status.add(str(items['stock']))
+        # print(items, status)
+        a = complete_list_of_set - status
+        if len(a) > 0:
+            for ind in a:
+                updated_dict = {'stock_count': 0, 'stock': str(ind), 'BID': x['BID']}
+                x['inventory'].append(updated_dict)
+
     return render_template('admin/popularBookReport.html', data=data)
 
 

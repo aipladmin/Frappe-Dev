@@ -84,7 +84,7 @@ class InventoryManager:
                                         lms.inventory
                                             left join
                                         lms.transactions ON inventory.IID = transactions.IID
-                                    GROUP BY transactions.Status , inventory.BID; ''')
+                                    GROUP BY transactions.Status , inventory.BID ORDER BY BID,stock desc; ''')
 
         lst = []
         for x in books:
