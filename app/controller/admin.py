@@ -224,38 +224,6 @@ def returnBooks_post():
     return redirect(url_for('admin.returnBooks'))
 
 
-# @admin.route('/report', methods=['GET', 'POST'])
-# def report():
-#     from collections import defaultdict
-#     tranObj = Transactions()
-#     OBJ = tranObj.check_outstanding()
-#     c = defaultdict(int)
-#     for d in OBJ:
-#         c[d['Full_Name'], d['Email_ID'], d['Mobile_No'], d['Auth']] += int(d['osAmount'])
-
-#     df = pd.DataFrame(OBJ)
-#     df = df[['Full_Name', 'Status', 'osAmount']]
-#     df['osAmount'] = df.osAmount.astype(int)
-#     df = df.pivot_table(index=['Full_Name'], columns=['Status'],
-#                         values=['osAmount'], aggfunc="sum")
-#     df_plot = df.plot.bar()
-#     for p in df_plot.patches:
-#         df_plot.annotate(str(p.get_height()), (p.get_x() * 1.005, p.get_height() * 1.005))
-#     df_plot.tick_params(axis='x', rotation=0)
-#     df_plot.figure.savefig(r'app\controller\static\img\report1.png')
-
-#     if request.method == 'POST':
-#         rendered = render_template('admin/report_pdf.html', data=c, DG=datetime.today().strftime('%d-%m-%Y %H:%M:%S'))
-#         pdf = pdfkit.from_string(rendered, False, configuration=WKHTML_CONFIG)
-#         response = make_response(pdf)
-#         response.headers['Content-Type'] = 'application/pdf'
-#         if 'view' in request.form:
-#             response.headers['Content-Disposition'] = 'inline; filename="report.pdf"'
-#         else:
-#             response.headers['Content-Disposition'] = 'attachment; filename="report.pdf"'
-#         return response
-#     return render_template('admin/report.html', data=c, df_plot=df_plot)
-
 @admin.route('/popular-book-report', methods=['GET', 'POST'])
 def popular_book_report():
     data = InventoryManager.inventory_merger()
