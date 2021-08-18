@@ -14,7 +14,7 @@
 {% include 'notifications.html' %}
 
 <div class="container-fluid">
-    <form method="post" action="{{ url_for('admin.returnBooks_post') }}">
+    <form method="post" action="{{ url_for('admin.return_books_post') }}">
     <select class="custom-select js-example-basic-single col-sm-4" name="gdEmail">
         <option value="">Select User</option>
         {% for x in user %}
@@ -27,7 +27,7 @@
 
 <br/>
 
-<form method="post" action="{{ url_for('admin.returnBooks') }}">
+<form method="post" action="{{ url_for('admin.return_books_post') }}">
     {% if gd|length == 0 %}
         <tr>
             <td>
@@ -50,7 +50,7 @@
         </form>
         <br/>
         <br/>
-        <form method="post" action="{{ url_for('admin.returnBooks_post') }}">
+        <form method="post" action="{{ url_for('admin.return_books_post') }}">
         <div class="container-fluid">
             <table class="table table-striped table-bordered">
             <thead class="table table-dark">

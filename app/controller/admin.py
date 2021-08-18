@@ -137,7 +137,7 @@ def member_detailed_info_post():
                         request.form['Auth'], request.form['MID']))
 
     flash("Member Detailed Updated.", "success")
-    return redirect(url_for('admin.member_detailed_info()'))
+    return redirect(url_for('admin.member_detailed_info'))
 
 
 @admin.route('/booking', methods=['GET'])
@@ -173,17 +173,17 @@ def return_books():
 
 
 @admin.route('/post-returnBooks', methods=['POST'])
-def returnBooks_post():
+def return_books_post():
     user = mysql_query("select * from lms.members")
     gd = Transactions().check_outstanding()
     if 'getData' in request.form:
         transaction_object = Transactions()
         gd = transaction_object.check_outstanding(email=request.form['gdEmail'])
-        return render_template('admin/returnBooks.html', user=user, gd=gd, enableAct="enableAct")
+        return render_template('admin/return_books.html', user=user, gd=gd, enableAct="enableAct")
     elif 'gdReturns' in request.form:
         mysql_query("UPDATE lms.transactions SET status='returned' WHERE transactions.TID={}".format(
             request.form['gdReturns']))
-        return render_template('admin/returnBooks.html', gd=gd)
+        return render_template('admin/return_books.html', gd=gd)
     elif 'gdAuth' in request.form:
         authStatus = mysql_query('select Auth from lms.members where MID={};'.format(request.form['gdAuth']))
         if authStatus[0]['Auth'] == "Activated":
@@ -192,8 +192,8 @@ def returnBooks_post():
         else:
             mysql_query("Update lms.members SET Auth='{}' WHERE MID={};".format(
                 "Activated", request.form['gdAuth']))
-        return redirect(url_for('admin.returnBooks'))
-    return redirect(url_for('admin.returnBooks'))
+        return redirect(url_for('admin.return_books'))
+    return redirect(url_for('admin.return_books'))
 
 
 @admin.route('/popular-book-report', methods=['GET'])
