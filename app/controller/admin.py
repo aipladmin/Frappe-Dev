@@ -161,7 +161,7 @@ def memberDetailedInfo():
         return redirect(url_for('admin.memberDetailedInfo'))
 
     data = mysql_query("select * from lms.members")
-    return render_template('admin/memberDetailedInfo.html', data=data)
+    return render_template('admin/member_detailed_info.html', data=data)
 
 
 @admin.route('/booking', methods=['GET', 'POST'])
@@ -187,17 +187,11 @@ def booking_ajax():
     return jsonify({'bookings': outstanding_data, 'charges': int(charges.charges)})
 
 
-# @admin.route('/cos', methods=['GET', 'POST'])
-# def cos():
-#     cosObj = Transactions(email='parikh.madhav1999@gmail.com')
-#     return "render_template"+str(cosObj.check_outstanding())
-
-
 @admin.route('/returnbookings', methods=['GET'])
 def return_books():
     user = mysql_query("select * from lms.members")
     member_data = Transactions().check_outstanding()
-    return render_template('admin/returnBooks.html', user=user, gd=member_data, enableAct="enableAct")
+    return render_template('admin/return_books.html', user=user, gd=member_data, enableAct="enableAct")
 
 
 @admin.route('/post-returnBooks', methods=['POST'])
@@ -240,7 +234,7 @@ def popular_book_report():
                 updated_dict = {'stock_count': 0, 'stock': str(ind), 'BID': x['BID']}
                 x['inventory'].append(updated_dict)
 
-    return render_template('admin/popularBookReport.html', data=data)
+    return render_template('admin/popular_book_report.html', data=data)
 
 
 @admin.route('/highest_paying_customer', methods=['GET', 'POST'])
