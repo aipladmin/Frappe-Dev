@@ -36,8 +36,8 @@ class Transactions:
             where transactions.Status != 'returned' and members.Email_ID='{}';'''.format(email))
 
         for x in cos:
-            x['osTimePeriod'] = (datetime.now().date()-x['Issued'].date())
-            x['osTimePeriod'] = str(x['osTimePeriod'].days)
+            time_period = (datetime.now().date()-x['Issued'].date())
+            x['osTimePeriod'] = str(time_period.days)
             day = (datetime.now().date()-x['Issued'].date()).days
 
             # FREE TRIAL CODE

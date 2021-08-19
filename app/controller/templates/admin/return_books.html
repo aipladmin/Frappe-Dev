@@ -27,27 +27,7 @@
 
 <br/>
 
-<form method="post" action="{{ url_for('admin.return_books_post') }}">
-    {% if gd|length == 0 %}
-        <tr>
-            <td>
-                <p class="text-danger" style="text-align: center;">
-                    No Books Issued
-                </p>
-            </td>
-        </tr>
-    {% else %}
-        {{gd[0]['Auth']}}
-        {% if enableAct=="enableAct" %}
-            {% if gd[0]['Auth'] == "Activated" %}
-                <button type="submit" class="btn btn-success float-right" name="gdAuth" value="{{ gd[0]['MID'] }}">Change {{ gd[0]['Auth'] }} Status
-                </button>
-            {% else %} 
-                <button type="submit" class="btn btn-danger float-right" name="gdAuth" value="{{ gd[0]['MID'] }}">Change {{ gd[0]['Auth'] }} Status
-                </button>
-            {% endif %}
-        {% endif %}
-        </form>
+
         <br/>
         <br/>
         <form method="post" action="{{ url_for('admin.return_books_post') }}">
@@ -75,9 +55,9 @@
                     <td>{{ x.osTimePeriod  }}</td>
                     <td>
                         {% if x.osAmount|int > 500 %}
-                            <button type="button" class="btn btn-outline-danger">{{ x.osAmount  }}</button>
+                            <button type="button" class="btn btn-outline-danger col-sm-10">{{ x.osAmount  }}</button>
                         {% else %}
-                            <button type="button" class="btn btn-outline-success">{{ x.osAmount  }}</button>
+                            <button type="button" class="btn btn-outline-success col-sm-10">{{ x.osAmount  }}</button>
                         {% endif %}
                     </td>
                     <td>
@@ -89,8 +69,7 @@
                     </td>
                 </tr>
                 {% endfor %}
-        {% endif %}
-    </tbody>
+     </tbody>
 </table>
 </form>
 </div>

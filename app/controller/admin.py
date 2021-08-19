@@ -49,6 +49,12 @@ def settings_post():
         )
     db.session.add(new_settings)
     db.session.commit()
+    mysql_query(''' INSERT INTO `lms`.`settings`
+                    (`Validity`,
+                    `Charges`,`Limit`,
+                    `Timestamp`)
+                    VALUES
+        ({},{},{},NOW());'''.format(int(validityPeriod), int(amountToCharge), int(threshold)))
     flash("Settings Updated Successfully.", "success")
     return redirect(url_for('admin.settings'))
 
@@ -180,19 +186,25 @@ def return_books_post():
         transaction_object = Transactions()
         gd = transaction_object.check_outstanding(email=request.form['gdEmail'])
         return render_template('admin/return_books.html', user=user, gd=gd, enableAct="enableAct")
+
     elif 'gdReturns' in request.form:
-        mysql_query("UPDATE lms.transactions SET status='returned' WHERE transactions.TID={}".format(
-            request.form['gdReturns']))
-        return render_template('admin/return_books.html', gd=gd)
-    elif 'gdAuth' in request.form:
-        authStatus = mysql_query('select Auth from lms.members where MID={};'.format(request.form['gdAuth']))
-        if authStatus[0]['Auth'] == "Activated":
-            mysql_query("Update lms.members SET Auth='{}' WHERE MID={};".format(
-                "Deactivated", request.form['gdAuth']))
-        else:
-            mysql_query("Update lms.members SET Auth='{}' WHERE MID={};".format(
-                "Activated", request.form['gdAuth']))
+        tid = request.form['gdReturns']
+        transaction_data = mysql_query('Select * from lms.transactions WHERE TID ={}'.format(tid))
+        if transaction_data[0]['Status'] == 'issued':
+            mysql_query("UPDATE lms.transactions SET status='returned',Returned=NOW() WHERE transactions.TID={}".format(tid))
+
+            sid = mysql_query("SELECT * from lms.settings order by timestamp desc limit 1;")
+            sid = sid[0]['SID']
+
+            mysql_query(''' INSERT INTO `lms`.`returns`
+                        (`SID`,
+                        `TID`,
+                        `Timestamp`)
+                        VALUES
+                        ({},{},NOW());
+                        '''.format(sid, tid))
         return redirect(url_for('admin.return_books'))
+
     return redirect(url_for('admin.return_books'))
 
 
