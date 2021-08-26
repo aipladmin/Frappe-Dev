@@ -1,4 +1,3 @@
-import pdfkit
 import platform
 import logging
 from flask import session, redirect, url_for
@@ -6,10 +5,10 @@ from functools import wraps
 from app import mysql
 
 
-if platform.system().lower() == "linux":
-    WKHTML_CONFIG = pdfkit.configuration(wkhtmltopdf='/usr/local/bin/wkhtmltopdf')
-if platform.system().lower() == "windows":
-    WKHTML_CONFIG = pdfkit.configuration(wkhtmltopdf='C:\\Program Files\\wkhtmltopdf\\bin\\wkhtmltopdf.exe')
+# if platform.system().lower() == "linux":
+#     WKHTML_CONFIG = pdfkit.configuration(wkhtmltopdf='/usr/local/bin/wkhtmltopdf')
+# if platform.system().lower() == "windows":
+#     WKHTML_CONFIG = pdfkit.configuration(wkhtmltopdf='C:\\Program Files\\wkhtmltopdf\\bin\\wkhtmltopdf.exe')
 
 logging.basicConfig(level=logging.WARNING)
 

@@ -7,7 +7,7 @@ from flask import (Blueprint, flash, jsonify, redirect,
                    render_template, request, url_for)
 
 from .admin_controller import InventoryManager, Transactions, api_caller
-from .controller import WKHTML_CONFIG, mysql_query
+from .controller import mysql_query
 from .models import db, Settings
 
 admin = Blueprint('admin', __name__, template_folder='templates', static_folder='static',
@@ -175,7 +175,7 @@ def return_books():
     return render_template('admin/return_books.html', user=user, gd=member_data, enableAct="enableAct")
 
 
-@admin.route('/post-returnBooks', methods=['POST'])
+@admin.route('/post/return/Books', methods=['POST'])
 def return_books_post():
     user = mysql_query("select * from lms.members")
     gd = Transactions().check_outstanding()
