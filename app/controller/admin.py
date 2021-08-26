@@ -1,18 +1,14 @@
 from datetime import datetime
 
-import matplotlib
 import pandas as pd
-import pdfkit
-from flask import (Blueprint, flash, jsonify, make_response, redirect,
+import numpy as np
+import matplotlib.pyplot as plt
+from flask import (Blueprint, flash, jsonify, redirect,
                    render_template, request, url_for)
 
 from .admin_controller import InventoryManager, Transactions, api_caller
-from .controller import WKHTML_CONFIG, mysql_query
-from flask import current_app as app
+from .controller import mysql_query
 from .models import db, Settings
-
-matplotlib.use('Agg')
-
 
 admin = Blueprint('admin', __name__, template_folder='templates', static_folder='static',
                   static_url_path='/controller/static')
@@ -31,31 +27,7 @@ def get_settings():
         return {"Status": 'Failure', 'Message': 'No Records Found!'}
 
 
-@admin.route('/testing', methods=['GET'])
-def user_records():
-    """Create a user via query string parameters."""
-    username = "madhav"
-    email = "madhav"
-    if username and email:
-        existing_user = Settings.query.order_by(Settings.timestamp.desc()).first()
-        app.logger.info(existing_user.validity)
-        if existing_user:
-            return str(existing_user)+"DONE"
-    new_settings = Settings(
-            validity=30,
-            charges=30,
-            timestamp=datetime.now()
-        )  # Create an instance of the User class
-    db.session.add(new_settings)  # Adds new User record to database
-    db.session.commit()
-    idd = new_settings.id
-    data = Settings.query.all()
-    for x in data:
-        app.logger.info(x.validity)
-    return str(Settings.query.all())+str(idd)
-
-
-@admin.route('/settings', methods=['GET', 'POST'])
+@admin.route('/settings', methods=['GET'])
 def settings():
     return render_template('admin/settings.html',
                            exsisting_settings=Settings.query.order_by(Settings.timestamp.desc()).first())
@@ -74,6 +46,12 @@ def settings_post():
         )
     db.session.add(new_settings)
     db.session.commit()
+    mysql_query(''' INSERT INTO `lms`.`settings`
+                    (`Validity`,
+                    `Charges`,`Limit`,
+                    `Timestamp`)
+                    VALUES
+        ({},{},{},NOW());'''.format(int(validityPeriod), int(amountToCharge), int(threshold)))
     flash("Settings Updated Successfully.", "success")
     return redirect(url_for('admin.settings'))
 
@@ -111,7 +89,6 @@ def inventory():
 
 @admin.route('/inventory-operations', methods=['POST'])
 def inventory_post():
-
     if 'update' in request.form:
         for _ in range(int(request.form['inventory'])):
             mysql_query("INSERT INTO lms.inventory(BID) values({});".format(request.form['update']))
@@ -144,10 +121,14 @@ def members():
     return render_template('admin/members.html')
 
 
-@admin.route('/member-detailedInfo', methods=['GET', 'POST'])
-def memberDetailedInfo():
-    if request.method == 'POST':
-        mysql_query('''UPDATE `lms`.`members`
+@admin.route('/member-detailedInfo', methods=['GET'])
+def member_detailed_info():
+    return render_template('admin/member_detailed_info.html', data=mysql_query("select * from lms.members"))
+
+
+@admin.route('/member-detailed-info/update', methods=['POST'])
+def member_detailed_info_post():
+    mysql_query('''UPDATE `lms`.`members`
                     SET
                     `Full_Name` = '{}',
                     `Email_ID` = '{}',
@@ -157,27 +138,27 @@ def memberDetailedInfo():
                     '''.format(
                         request.form['Full_Name'], request.form['Email_ID'], request.form['Mobile_No'],
                         request.form['Auth'], request.form['MID']))
-        flash("Member Detailed Updated.", "success")
-        return redirect(url_for('admin.memberDetailedInfo'))
 
-    data = mysql_query("select * from lms.members")
-    return render_template('admin/memberDetailedInfo.html', data=data)
+    flash("Member Detailed Updated.", "success")
+    return redirect(url_for('admin.member_detailed_info'))
 
 
-@admin.route('/booking', methods=['GET', 'POST'])
+@admin.route('/booking', methods=['GET'])
 def bookings():
-    if request.method == 'POST':
-        MID = mysql_query("select MID from lms.members where Email_ID='{}';".format(request.form['User']))
-        MID = MID[0]['MID']
-        mysql_query('INSERT into lms.transactions(IID,MID) values({},{})'.format(request.form['books'], MID))
-        flash("Book Issued.", "success")
-        return redirect(url_for('admin.bookings'))
-
     user = mysql_query("select * from lms.members where Auth != 'Terminated';")
     books = mysql_query('''select IID,title,authors,publisher from lms.books inner join
     lms.inventory ON inventory.BID=books.BID where inventory.IID
     NOT IN (select IID from lms.transactions where Status='issued');''')
     return render_template('admin/bookings.html', User=user, books=books)
+
+
+@admin.route('/bookings/update', methods=['POST'])
+def bookings_post():
+    MID = mysql_query("select MID from lms.members where Email_ID='{}';".format(request.form['User']))
+    MID = MID[0]['MID']
+    mysql_query('INSERT into lms.transactions(IID,MID) values({},{})'.format(request.form['books'], MID))
+    flash("Book Issued.", "success")
+    return redirect(url_for('admin.bookings'))
 
 
 @admin.route('/booking/ajax', methods=['GET', 'POST'])
@@ -187,114 +168,74 @@ def booking_ajax():
     return jsonify({'bookings': outstanding_data, 'charges': int(charges.charges)})
 
 
-# @admin.route('/cos', methods=['GET', 'POST'])
-# def cos():
-#     cosObj = Transactions(email='parikh.madhav1999@gmail.com')
-#     return "render_template"+str(cosObj.check_outstanding())
-
-
-@admin.route('/returnbookings', methods=['GET', 'POST'])
-def returnBooks():
+@admin.route('/returnbookings', methods=['GET'])
+def return_books():
     user = mysql_query("select * from lms.members")
-    gd = Transactions().check_outstanding()
-    return render_template('admin/returnBooks.html', user=user, gd=gd, enableAct="enableAct")
+    member_data = Transactions().check_outstanding()
+    return render_template('admin/return_books.html', user=user, gd=member_data, enableAct="enableAct")
 
 
-@admin.route('/post-returnBooks', methods=['POST'])
-def returnBooks_post():
+@admin.route('/post/return/Books', methods=['POST'])
+def return_books_post():
     user = mysql_query("select * from lms.members")
     gd = Transactions().check_outstanding()
     if 'getData' in request.form:
         transaction_object = Transactions()
         gd = transaction_object.check_outstanding(email=request.form['gdEmail'])
-        return render_template('admin/returnBooks.html', user=user, gd=gd, enableAct="enableAct")
+        return render_template('admin/return_books.html', user=user, gd=gd, enableAct="enableAct")
+
     elif 'gdReturns' in request.form:
-        mysql_query("UPDATE lms.transactions SET status='returned' WHERE transactions.TID={}".format(
-            request.form['gdReturns']))
-        return render_template('admin/returnBooks.html', gd=gd)
-    elif 'gdAuth' in request.form:
-        authStatus = mysql_query('select Auth from lms.members where MID={};'.format(request.form['gdAuth']))
-        if authStatus[0]['Auth'] == "Activated":
-            mysql_query("Update lms.members SET Auth='{}' WHERE MID={};".format(
-                "Deactivated", request.form['gdAuth']))
-        else:
-            mysql_query("Update lms.members SET Auth='{}' WHERE MID={};".format(
-                "Activated", request.form['gdAuth']))
-        return redirect(url_for('admin.returnBooks'))
-    return redirect(url_for('admin.returnBooks'))
+        tid = request.form['gdReturns']
+        transaction_data = mysql_query('Select * from lms.transactions WHERE TID ={}'.format(tid))
+        if transaction_data[0]['Status'] == 'issued':
+            mysql_query("UPDATE lms.transactions SET status='returned',Returned=NOW() WHERE transactions.TID={}".format(tid))
+
+            sid = mysql_query("SELECT * from lms.settings order by timestamp desc limit 1;")
+            sid = sid[0]['SID']
+
+            mysql_query(''' INSERT INTO `lms`.`returns`
+                        (`SID`,
+                        `TID`,
+                        `Timestamp`)
+                        VALUES
+                        ({},{},NOW());
+                        '''.format(sid, tid))
+        return redirect(url_for('admin.return_books'))
+
+    return redirect(url_for('admin.return_books'))
 
 
-@admin.route('/report', methods=['GET', 'POST'])
-def report():
-    from collections import defaultdict
-    tranObj = Transactions()
-    OBJ = tranObj.check_outstanding()
-    c = defaultdict(int)
-    for d in OBJ:
-        c[d['Full_Name'], d['Email_ID'], d['Mobile_No'], d['Auth']] += int(d['osAmount'])
+@admin.route('/popular-book-report', methods=['GET'])
+def popular_book_report():
+    data = InventoryManager.inventory_merger()
 
-    df = pd.DataFrame(OBJ)
-    df = df[['Full_Name', 'Status', 'osAmount']]
+    complete_list_of_set = {'In Stock', 'returned', 'issued'}
+    data = data['books_inventory']
+    for x in data:
+        status = set()
+        for items in x['inventory']:
+            status.add(str(items['stock']))
+        non_exsistant_set = complete_list_of_set - status
+        if len(non_exsistant_set) > 0:
+            for ind in non_exsistant_set:
+                updated_dict = {'stock_count': 0, 'stock': str(ind), 'BID': x['BID']}
+                x['inventory'].append(updated_dict)
+    return render_template('admin/reports/popular_book_report.html', data=data)
+
+
+@admin.route('/highest_paying_customer', methods=['GET', 'POST'])
+def highest_paying_customer():
+    member_data = Transactions().check_outstanding()
+    df = pd.DataFrame(member_data)
+    df.drop(['Issued','bookID','title','authors','Registered','Returned','BID','TID','IID','MID','isbn','isbn13','average_rating','language_code','num_pages','ratings_count','text_reviews_count','publication_date','publisher','osTimePeriod'], axis=1, inplace=True)
     df['osAmount'] = df.osAmount.astype(int)
-    df = df.pivot_table(index=['Full_Name'], columns=['Status'],
-                        values=['osAmount'], aggfunc="sum")
-    df_plot = df.plot.bar()
-    for p in df_plot.patches:
-        df_plot.annotate(str(p.get_height()), (p.get_x() * 1.005, p.get_height() * 1.005))
-    df_plot.tick_params(axis='x', rotation=0)
-    df_plot.figure.savefig(r'app\controller\static\img\report1.png')
+    df = df[df.Status == 'issued']
 
-    if request.method == 'POST':
-        rendered = render_template('admin/report_pdf.html', data=c, DG=datetime.today().strftime('%d-%m-%Y %H:%M:%S'))
-        pdf = pdfkit.from_string(rendered, False, configuration=WKHTML_CONFIG)
-        response = make_response(pdf)
-        response.headers['Content-Type'] = 'application/pdf'
-        if 'view' in request.form:
-            response.headers['Content-Disposition'] = 'inline; filename="report.pdf"'
-        else:
-            response.headers['Content-Disposition'] = 'attachment; filename="report.pdf"'
-        return response
-    return render_template('admin/report.html', data=c, df_plot=df_plot)
+    df = pd.pivot_table(df, values=['osAmount'], index=['Full_Name'], aggfunc=np.sum)
 
-    """
-    Report
-
-    Report:
-        Most popular books with quantity available in the library and total quantity.
-    """
-
-
-@admin.route('/report1', methods=['GET', 'POST'])
-def report1():
-    data = mysql_query('''SELECT
-                        books.title,
-                        books.authors,
-                        books.publisher,
-                        books.isbn,
-                        COUNT(CASE Status
-                            WHEN 'issued' THEN 1
-                            ELSE NULL
-                        END) AS 'Issued',
-                        COUNT(CASE Status
-                            WHEN 'returned' THEN 1
-                            ELSE NULL
-                        END) AS 'Returned'
-                    FROM
-                        lms.transactions
-                            INNER JOIN
-                        lms.inventory ON inventory.IID = transactions.IID
-                            INNER JOIN
-                        lms.books ON books.BID = inventory.BID;''')
-    if request.method == 'POST':
-        rendered = render_template('admin/report1_pdf.html', data=data,
-                                   DG=datetime.today().strftime('%d-%m-%Y %H:%M:%S'))
-        pdf = pdfkit.from_string(rendered, False, configuration=WKHTML_CONFIG)
-        response = make_response(pdf)
-        response.headers['Content-Type'] = 'application/pdf'
-        if 'view' in request.form:
-            response.headers['Content-Disposition'] = 'inline; filename="report1.pdf"'
-        else:
-            response.headers['Content-Disposition'] = 'attachment; filename="report1.pdf"'
-        return response
-
-    return render_template('admin/report1.html', data=data)
+    ax = df.plot.bar()
+    ax.set_ylabel("Outstanding Amount")
+    ax.set_xlabel("Full Name")
+    plt.xticks(rotation=0)
+    plt.savefig('app/controller/static/reports/highest_paying_customer.jpg', dpi=100)
+    return render_template('admin/reports/highest_paying_customer.html', data=member_data)

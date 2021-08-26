@@ -1,0 +1,55 @@
+{% extends 'index.html' %}
+{% block content %}
+<style>
+  .input {
+  padding-right: 0;  
+  padding-left: 0;
+}
+</style>
+
+<!-- Page Heading -->
+  <div class="d-sm-flex align-items-center justify-content-between mb-4">
+    <h1 class="h3 mb-0 text-gray-800">Popular Book Report</h1>
+  </div>
+
+{% include 'notifications.html' %}
+
+<div class="container-fluid">
+  <table class="table table-striped">
+     <thead>
+      <tr>
+        <th>Title</th>
+        <th>Authors</th>
+        <th>Publishers</th>
+        <th>In Stock</th>
+        <th>Issued</th>
+      </tr>
+    </thead>
+    <tbody>
+      {% for x in data %}
+      <tr>
+          <td>{{ x.title }}</td>
+          <td>{{ x.authors }}</td>
+          <td>{{ x.publisher }}</td>
+          {% set ns = namespace(total=0) %}
+          {% for items in x.inventory %}
+            {% if items['stock'] == "In Stock" or items['stock'] == "returned"   %}
+              {% set ns.total = ns.total|int + items['stock_count']|int %}
+            {% endif %}
+          {% endfor %}
+
+            <td>{{ns.total }}</td>
+
+          {% for items in x.inventory %}
+            {% if items['stock'] == "issued"   %}
+              <td>{{ items.stock_count }}</td>
+            {% endif %}
+          {% endfor %}
+      </tr>
+      {% endfor %}
+    </tbody>
+  </table>
+</div>
+   
+
+{% endblock %}

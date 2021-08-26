@@ -36,10 +36,14 @@ class Transactions:
             where transactions.Status != 'returned' and members.Email_ID='{}';'''.format(email))
 
         for x in cos:
-            x['osTimePeriod'] = (datetime.now().date()-x['Issued'].date())
-            x['osTimePeriod'] = str(x['osTimePeriod'].days)
-            day = (datetime.now().date()-x['Issued'].date()).days
-
+            if x['Status'] == 'issued':
+                time_period = (datetime.now().date()-x['Issued'].date())
+                x['osTimePeriod'] = str(time_period.days)
+                day = (datetime.now().date()-x['Issued'].date()).days
+            else:
+                time_period = (x['Returned'].date()-x['Issued'].date())
+                x['osTimePeriod'] = str(time_period.days)
+                day = (x['Returned'].date()-x['Issued'].date()).days
             # FREE TRIAL CODE
             day = day - int(data['Validity'])
             if day < 0:
@@ -84,7 +88,7 @@ class InventoryManager:
                                         lms.inventory
                                             left join
                                         lms.transactions ON inventory.IID = transactions.IID
-                                    GROUP BY transactions.Status , inventory.BID; ''')
+                                    GROUP BY transactions.Status , inventory.BID ORDER BY BID,stock desc; ''')
 
         lst = []
         for x in books:
