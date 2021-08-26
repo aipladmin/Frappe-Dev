@@ -1,17 +1,14 @@
 from datetime import datetime
 
-import matplotlib
 import pandas as pd
-import pdfkit
-from flask import (Blueprint, flash, jsonify, make_response, redirect,
+import numpy as np
+import matplotlib.pyplot as plt
+from flask import (Blueprint, flash, jsonify, redirect,
                    render_template, request, url_for)
 
 from .admin_controller import InventoryManager, Transactions, api_caller
 from .controller import WKHTML_CONFIG, mysql_query
 from .models import db, Settings
-
-matplotlib.use('Agg')
-
 
 admin = Blueprint('admin', __name__, template_folder='templates', static_folder='static',
                   static_url_path='/controller/static')
@@ -230,17 +227,16 @@ def popular_book_report():
 @admin.route('/highest_paying_customer', methods=['GET', 'POST'])
 def highest_paying_customer():
     member_data = Transactions().check_outstanding()
+    df = pd.DataFrame(member_data)
+    df.drop(['Issued','bookID','title','authors','Registered','Returned','BID','TID','IID','MID','isbn','isbn13','average_rating','language_code','num_pages','ratings_count','text_reviews_count','publication_date','publisher','osTimePeriod'], axis=1, inplace=True)
+    df['osAmount'] = df.osAmount.astype(int)
+    df = df[df.Status == 'issued']
 
-    if request.method == 'POST':
-        rendered = render_template('admin/report1_pdf.html', data=data,
-                                   DG=datetime.today().strftime('%d-%m-%Y %H:%M:%S'))
-        pdf = pdfkit.from_string(rendered, False, configuration=WKHTML_CONFIG)
-        response = make_response(pdf)
-        response.headers['Content-Type'] = 'application/pdf'
-        if 'view' in request.form:
-            response.headers['Content-Disposition'] = 'inline; filename="report1.pdf"'
-        else:
-            response.headers['Content-Disposition'] = 'attachment; filename="report1.pdf"'
-        return response
+    df = pd.pivot_table(df, values=['osAmount'], index=['Full_Name'], aggfunc=np.sum)
 
-    return render_template('admin/highest_paying_customer.html', data=member_data)
+    ax = df.plot.bar()
+    ax.set_ylabel("Outstanding Amount")
+    ax.set_xlabel("Full Name")
+    plt.xticks(rotation=0)
+    plt.savefig('app/controller/static/reports/highest_paying_customer.jpg', dpi=100)
+    return render_template('admin/reports/highest_paying_customer.html', data=member_data)

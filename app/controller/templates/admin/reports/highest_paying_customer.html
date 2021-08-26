@@ -15,6 +15,23 @@
         <button type="button" class="d-none d-sm-inline-block btn btn-sm btn-success shadow-sm" data-toggle="modal" data-target="#graph">
             Display Graph
         </button>
+        <div class="modal fade" id="graph" tabindex="-1" role="dialog" aria-labelledby="exampleModalLabel" aria-hidden="true">
+            <div class="modal-dialog modal-lg" role="document">
+                <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title" id="exampleModalLabel">Report</h5>
+                    <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                    <span aria-hidden="true">&times;</span>
+                    </button>
+                </div>
+                <div class="modal-body">
+                    <center>
+                        <img src="{{ url_for('.static',filename='reports/highest_paying_customer.jpg') }}">
+                    </center>
+                </div>
+                </div>
+            </div>
+        </div>
     </form> 
   </div>
 {% include 'notifications.html' %}
