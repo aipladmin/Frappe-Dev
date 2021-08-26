@@ -220,8 +220,7 @@ def popular_book_report():
             for ind in non_exsistant_set:
                 updated_dict = {'stock_count': 0, 'stock': str(ind), 'BID': x['BID']}
                 x['inventory'].append(updated_dict)
-
-    return render_template('admin/popular_book_report.html', data=data)
+    return render_template('admin/reports/popular_book_report.html', data=data)
 
 
 @admin.route('/highest_paying_customer', methods=['GET', 'POST'])
