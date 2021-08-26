@@ -1,1 +1,1 @@
-web: gunicorn Frappe-Dev.application:app
+web: gunicorn application:app
