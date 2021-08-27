@@ -30,8 +30,6 @@ pip install -r requirements.txt
 ```
 
 ## Run the Python Application ##
-Here comes the tricky part, particularly in this flask application, the code structure is based on <b>Blueprints</b> or <b>Factory Application Structure</b>
-and that is the reason you see multiple python files all over the project.<br/>
 To run the application we will run the following command:
 ```
 python app.py
