@@ -161,7 +161,7 @@ class Books:
                 for x in y.items():
                     ditList.append(str(x[1]))
 
-            dateObj = datetime.strptime(str(dictStrip['publication_date']), '%m/%d/%Y')
+            data_conversion = datetime.strptime(str(dictStrip['publication_date']), '%m/%d/%Y')
             i += 1
 
             if str(dictStrip['bookID']) in ditList:
@@ -177,7 +177,7 @@ class Books:
                                ''.join(dictStrip['language_code']),
                             int(dictStrip['num_pages']), int(dictStrip['ratings_count']),
                             int(dictStrip['text_reviews_count']),
-                            str(dateObj.date()), ''.join(dictStrip['publisher']))))
+                            str(data_conversion.date()), ''.join(dictStrip['publisher']))))
 
                 mysql_query("insert into lms.inventory(BID) values({});".format(mysql_query.last_row_id))
         return None
