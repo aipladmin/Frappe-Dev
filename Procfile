@@ -1,1 +1,1 @@
-web: gunicorn app.Frappe-Dev:app  --log-file - --log-level debug
+web: gunicorn Frappe-Dev.app:app  --log-file - --log-level debug
