@@ -3,7 +3,7 @@ from datetime import datetime
 import pandas as pd
 import numpy as np
 import matplotlib.pyplot as plt
-from flask import (Blueprint, flash, jsonify, redirect,
+from flask import (Blueprint, flash, jsonify, redirect, session,
                    render_template, request, url_for)
 
 from .admin_controller import InventoryManager, Transactions, api_caller
@@ -14,10 +14,11 @@ admin = Blueprint('admin', __name__, template_folder='templates', static_folder=
                   static_url_path='/controller/static')
 
 
-# @admin.before_request
-# def before_request():
-#     session.pop('email', '')
-#     session.clear()
+@admin.before_request
+def before_request():
+    session.pop('email', '')
+    # session.clear()
+
 
 def get_settings():
     settings = Settings.query.order_by(Settings.timestamp.desc()).first()
