@@ -3,13 +3,17 @@ from flaskext.mysql import MySQL
 import decimal
 import flask.json
 from .config import Config
-import sentry_sdk
 from flask_sqlalchemy import SQLAlchemy
+import sentry_sdk
 from sentry_sdk.integrations.flask import FlaskIntegration
 
 sentry_sdk.init(
-    dsn="https://17484623a4d4464f8ce92018281972d9@o416140.ingest.sentry.io/5802801",
+    dsn="https://82d4dc242ad346e987496f9b07776adf@o416140.ingest.sentry.io/5933949",
     integrations=[FlaskIntegration()],
+
+    # Set traces_sample_rate to 1.0 to capture 100%
+    # of transactions for performance monitoring.
+    # We recommend adjusting this value in production.
     traces_sample_rate=1.0
 )
 
