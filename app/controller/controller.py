@@ -1,6 +1,6 @@
-import platform
+from flask_mail import Mail, Message
 import logging
-from flask import session, redirect, url_for
+from flask import session, redirect, url_for, render_template
 from functools import wraps
 from app import mysql
 
@@ -47,3 +47,27 @@ def mysql_query(sql):
         cursor.close()
         connection.close()
         return None
+
+
+# login validator
+def login_required(f):
+    @wraps(f)
+    def wrap(*args, **kwargs):
+        if 'email' in session and 'company' in session:
+            return f(*args, **kwargs)
+        else:
+            return redirect(url_for('auth.login'))
+    return wrap
+
+
+# MAIL DRIVER
+def send_mail(**deets):
+    # try:
+    mail = Mail()
+    msg = Message(deets['Subject'],
+                  recipients=[deets['Emailid']])
+    msg.html = render_template('auth/mail.html', emailid=deets['Emailid'],
+                               otp=deets['OTP'])
+    mail.send(msg)
+    # except Exception as e:
+    #     return {"Error": str(e)}

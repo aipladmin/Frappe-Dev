@@ -17,3 +17,7 @@ class Config(object):
                     'MYSQL_DATABASE_PASSWORD': str(os.environ.get('MYSQL_DATABASE_PASSWORD')),
                     'MYSQL_DATABASE_HOST': 'database-1.ceo7csjfbddw.ap-south-1.rds.amazonaws.com'
     }
+    EmailConfig = {
+        'MAIL_USERNAME': 'developer.websupp@gmail.com',
+        'MAIL_PASSWORD': str(os.environ.get('MAIL_PASSWORD'))
+    }

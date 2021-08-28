@@ -4,6 +4,7 @@ import decimal
 import flask.json
 from .config import Config
 from flask_sqlalchemy import SQLAlchemy
+from flask_mail import Mail
 import sentry_sdk
 from sentry_sdk.integrations.flask import FlaskIntegration
 
@@ -44,12 +45,23 @@ def create_app():
     app.config['MYSQL_DATABASE_HOST'] = str(Config.DatabaseConfig.get('MYSQL_DATABASE_HOST'))
     mysql.init_app(app)
 
+    mail = Mail()
+    app.config['MAIL_SERVER'] = 'smtp.gmail.com'
+    app.config['MAIL_PORT'] = 465
+    app.config['MAIL_USE_SSL'] = True
+    app.config['MAIL_USERNAME'] = str(Config.EmailConfig.get('MAIL_USERNAME'))
+    app.config['MAIL_PASSWORD'] = str(Config.EmailConfig.get('MAIL_PASSWORD'))
+    app.config['MAIL_DEFAULT_SENDER'] = str(Config.EmailConfig.get('MAIL_USERNAME'))
+    app.config['MAIL_USE_TLS'] = False
+    mail.init_app(app)
+
     from app.controller import (
-        admin, user
+        admin, user, auth
     )
 
     app.register_blueprint(admin.admin)
     app.register_blueprint(user.user)
+    app.register_blueprint(auth.auth)
 
     app.config['SQLALCHEMY_TRACK_MODIFICATIONS'] = False
     app.config['SQLALCHEMY_DATABASE_URI'] = 'sqlite:///settings.sqlite3'

@@ -1,6 +1,38 @@
 """Data models."""
 from app import db
+from sqlalchemy.orm import relationship
+from sqlalchemy import Table, Column, Integer, ForeignKey
 
+
+class Users(db.Model):
+    __tablename__ = 'users'
+    uid = db.Column(
+        db.Integer,
+        primary_key=True)
+    email = db.Column(
+        db.String(120),
+        unique=True,
+        nullable=False)
+    timestamp = db.Column(
+        db.DateTime,
+        index=False,
+        unique=False,
+        nullable=False
+    )
+    children = relationship("Creds")
+
+
+class Creds(db.Model):
+    __tablename__ = 'creds'
+    cid = db.Column(db.Integer, primary_key=True)
+    uid = db.Column(db.Integer, ForeignKey('users.uid'))
+    otp = db.Column(db.Integer, nullable=False, unique=True)
+    timestamp = db.Column(
+        db.DateTime,
+        index=False,
+        unique=False,
+        nullable=False
+    )
 
 class Settings(db.Model):
     """Data model for Settings."""
