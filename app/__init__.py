@@ -65,6 +65,7 @@ def create_app():
 
     app.config['SQLALCHEMY_TRACK_MODIFICATIONS'] = False
     app.config['SQLALCHEMY_DATABASE_URI'] = 'sqlite:///settings.sqlite3'
+    app.config['SQLALCHEMY_ECHO'] = False
 
     with app.app_context():
         db.init_app(app)  # Initialize SQLAlchemy with this app
