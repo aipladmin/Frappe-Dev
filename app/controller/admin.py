@@ -7,17 +7,23 @@ from flask import (Blueprint, flash, jsonify, redirect, session,
                    render_template, request, url_for)
 
 from .admin_controller import InventoryManager, Transactions, api_caller
-from .controller import mysql_query
+from .controller import mysql_query, login_required
 from .models import db, Settings
 
 admin = Blueprint('admin', __name__, template_folder='templates', static_folder='static',
-                  static_url_path='/controller/static')
+                  static_url_path='/controller/static', url_prefix='/admin')
 
 
-@admin.before_request
-def before_request():
-    session.pop('email', '')
-    # session.clear()
+# @admin.before_request
+# def before_request():
+#     session.pop('email', '')
+#     # session.clear()
+
+@admin.route('/')
+@admin.route('/index')
+@login_required
+def index():
+    return render_template('index.html')
 
 
 def get_settings():
@@ -28,7 +34,8 @@ def get_settings():
         return {"Status": 'Failure', 'Message': 'No Records Found!'}
 
 
-@admin.route('/settings', methods=['GET'])
+@admin.route('/settings')
+@login_required
 def settings():
     return render_template('admin/settings.html',
                            exsisting_settings=Settings.query.order_by(Settings.timestamp.desc()).first())
@@ -57,13 +64,7 @@ def settings_post():
     return redirect(url_for('admin.settings'))
 
 
-@admin.route('/')
-@admin.route('/index')
-def index():
-    return render_template('index.html')
-
-
-@admin.route('/books', methods=['GET'])
+@admin.route('/books')
 def books():
     title = mysql_query("select distinct(title) as 'title' from lms.books")
     authors = mysql_query("select distinct(authors) as 'authors' from lms.books")
@@ -81,7 +82,7 @@ def books_to_inv():
     return redirect(url_for('admin.books'))
 
 
-@admin.route('/inventory', methods=['GET'])
+@admin.route('/inventory')
 def inventory():
     inventory_obj = InventoryManager()
     inventory = inventory_obj.inventory_merger()
@@ -122,7 +123,7 @@ def members():
     return render_template('admin/members.html')
 
 
-@admin.route('/member-detailedInfo', methods=['GET'])
+@admin.route('/member-detailedInfo')
 def member_detailed_info():
     return render_template('admin/member_detailed_info.html', data=mysql_query("select * from lms.members"))
 
@@ -144,7 +145,7 @@ def member_detailed_info_post():
     return redirect(url_for('admin.member_detailed_info'))
 
 
-@admin.route('/booking', methods=['GET'])
+@admin.route('/booking')
 def bookings():
     user = mysql_query("select * from lms.members where Auth != 'Terminated';")
     books = mysql_query('''select IID,title,authors,publisher from lms.books inner join
@@ -169,7 +170,7 @@ def booking_ajax():
     return jsonify({'bookings': outstanding_data, 'charges': int(charges.charges)})
 
 
-@admin.route('/returnbookings', methods=['GET'])
+@admin.route('/returnbookings')
 def return_books():
     user = mysql_query("select * from lms.members")
     member_data = Transactions().check_outstanding()
@@ -206,7 +207,7 @@ def return_books_post():
     return redirect(url_for('admin.return_books'))
 
 
-@admin.route('/popular-book-report', methods=['GET'])
+@admin.route('/popular-book-report')
 def popular_book_report():
     data = InventoryManager.inventory_merger()
 
@@ -228,7 +229,7 @@ def popular_book_report():
 def highest_paying_customer():
     member_data = Transactions().check_outstanding()
     df = pd.DataFrame(member_data)
-    df.drop(['Issued','bookID','title','authors','Registered','Returned','BID','TID','IID','MID','isbn','isbn13','average_rating','language_code','num_pages','ratings_count','text_reviews_count','publication_date','publisher','osTimePeriod'], axis=1, inplace=True)
+    df.drop(['Issued', 'bookID', 'title', 'authors', 'Registered', 'Returned', 'BID', 'TID', 'IID', 'MID', 'isbn', 'isbn13', 'average_rating', 'language_code', 'num_pages', 'ratings_count', 'text_reviews_count', 'publication_date', 'publisher', 'osTimePeriod'], axis=1, inplace=True)
     df['osAmount'] = df.osAmount.astype(int)
     df = df[df.Status == 'issued']
 

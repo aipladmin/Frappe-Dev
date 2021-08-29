@@ -1,24 +1,19 @@
-from flask import render_template, Blueprint, session, request
-from datetime import timedelta
+from flask import render_template, Blueprint, session
 from .controller import mysql_query
-import app
 
 user = Blueprint('user', __name__, template_folder='templates', static_folder='static',
                  static_url_path='/controller/static', url_prefix='/user')
 
 
-@user.before_request
-def before_request():
-    session.permanent = True
-    app.permanent_session_lifetime = timedelta(minutes=10)
+# @user.before_request
+# def before_request():
+#     session.permanent = True
+#     app.permanent_session_lifetime = timedelta(minutes=10)
 
 
 @user.route('/', methods=['GET', 'POST'])
 def user_index():
-    if request.method == 'POST':
-        session['email'] = request.form['email']
-        return render_template('index.html')
-    return render_template('user/user_cred.html')
+    return render_template('index.html')
 
 
 @user.route('/vb')
