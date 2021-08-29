@@ -1,7 +1,8 @@
 """Data models."""
 from app import db
+from datetime import datetime
 from sqlalchemy.orm import relationship
-from sqlalchemy import Table, Column, Integer, ForeignKey
+from sqlalchemy import ForeignKey
 
 
 class Users(db.Model):
@@ -34,6 +35,7 @@ class Creds(db.Model):
         nullable=False
     )
 
+
 class Settings(db.Model):
     """Data model for Settings."""
 
@@ -46,13 +48,15 @@ class Settings(db.Model):
         db.Integer(),
         index=False,
         unique=False,
-        nullable=False
+        nullable=False,
+        default=0
     )
     charges = db.Column(
         db.Integer(),
         index=True,
         unique=False,
-        nullable=False
+        nullable=False,
+        default=50
     )
     limit = db.Column(
         db.Integer(),
@@ -65,7 +69,8 @@ class Settings(db.Model):
         db.DateTime,
         index=False,
         unique=False,
-        nullable=False
+        nullable=False,
+        default=datetime.now()
     )
 
     def __repr__(self):
