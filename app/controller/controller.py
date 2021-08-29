@@ -53,7 +53,7 @@ def mysql_query(sql):
 def login_required(f):
     @wraps(f)
     def wrap(*args, **kwargs):
-        if 'email' in session and 'company' in session:
+        if 'email' in session and 'user_type' in session:
             return f(*args, **kwargs)
         else:
             return redirect(url_for('auth.login'))
