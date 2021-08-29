@@ -11,7 +11,7 @@ user = Blueprint('user', __name__, template_folder='templates', static_folder='s
 #     app.permanent_session_lifetime = timedelta(minutes=10)
 
 
-@user.route('/', methods=['GET', 'POST'])
+@user.route('/')
 def user_index():
     return render_template('index.html')
 
