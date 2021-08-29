@@ -60,7 +60,7 @@
                 </a>
                 <div id="AIPL" class="collapse" aria-labelledby="headingUtilities"
                     data-parent="#accordionSidebar">
-                    {% if session.get('email','') == '' %}
+                    {% if session.get('user_type') == 'librarian' %}
                     <div class="bg-white py-2 collapse-inner rounded">
                         <h6 class="collapse-header">Custom Utilities:</h6>
                             <a class="collapse-item" href="{{ url_for('admin.books') }}">Upload Books</a>
@@ -77,7 +77,7 @@
                     {% endif %}
                 </div>
             </li>
-            {% if session.get('email','') == '' %}
+            {% if session.get('user_type') == 'librarian' %}
             <li class="nav-item">
                 <a class="nav-link collapsed" href="#" data-toggle="collapse" data-target="#collapsePages"
                     aria-expanded="true" aria-controls="collapsePages">
@@ -121,20 +121,19 @@
                         <li class="nav-item dropdown no-arrow">
                             <a class="nav-link dropdown-toggle" href="#" id="userDropdown" role="button"
                                 data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
-                                <span class="mr-2 d-none d-lg-inline text-gray-600 small">{{ session.get('email','') }}</span>
+                                <span class="mr-2 d-none d-lg-inline text-gray-600 small">{{ session.get('emailid','') }}</span>
                                <i class="fas fa-user-shield"></i>
                             </a>
                             <!-- Dropdown - User Information -->
                             <div class="dropdown-menu dropdown-menu-right shadow animated--grow-in"
                                 aria-labelledby="userDropdown">
-                                {% if session.get('email','') == '' %}
+                                {% if session.get('user_type') == 'librarian' %}
                                 <a class="dropdown-item" href="{{ url_for('admin.settings') }}">
                                     <i class="fas fa-cogs fa-sm fa-fw mr-2 text-gray-400"></i>
                                     Settings
                                 </a>
                                 {% endif %}
-                                <!-- <a class="dropdown-item" href="#" data-toggle="modal" data-target="#logoutModal"> -->
-                                    <a class="dropdown-item" href="" >
+                                <a class="dropdown-item" href="{{ url_for('auth.logout') }}" >
                                     <i class="fas fa-sign-out-alt fa-sm fa-fw mr-2 text-gray-400"></i>
                                     Logout
                                 </a>
