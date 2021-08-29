@@ -13,16 +13,6 @@ from app import mysql
 logging.basicConfig(level=logging.WARNING)
 
 
-# DECORATORS
-def user_sess(f):
-    @wraps(f)
-    def wrap(*args, **kwargs):
-        if 'email' in session:
-            return f(*args, **kwargs)
-        return redirect(url_for('auth.login'))
-    return wrap
-
-
 def mysql_query(sql):
     logging.warning(sql)
     connection = mysql.connect()
@@ -53,7 +43,7 @@ def mysql_query(sql):
 def login_required(f):
     @wraps(f)
     def wrap(*args, **kwargs):
-        if 'email' in session and 'user_type' in session:
+        if 'emailid' in session and 'user_type' in session:
             return f(*args, **kwargs)
         else:
             return redirect(url_for('auth.login'))
@@ -69,5 +59,3 @@ def send_mail(**deets):
     msg.html = render_template('auth/mail.html', emailid=deets['Emailid'],
                                otp=deets['OTP'])
     mail.send(msg)
-    # except Exception as e:
-    #     return {"Error": str(e)}
