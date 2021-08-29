@@ -2,9 +2,10 @@ from flask import render_template, Blueprint, request, session, redirect, url_fo
 from .auth_controller import Auth_Verification
 
 auth = Blueprint('auth', __name__, template_folder='templates', static_folder='static',
-                 static_url_path='/controller/static', url_prefix='/auth')
+                 static_url_path='/controller/static', url_prefix='/')
 
 
+@auth.route('/')
 @auth.route('/auth')
 def login():
     return render_template('auth/login.html')
