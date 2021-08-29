@@ -5,8 +5,8 @@ import os
 
 class Config(object):
 
-    TESTING = True
-    DEBUG = True
+    TESTING = False
+    DEBUG = False
 
     FLASK_ENV = 'development'
     secret_key = secrets.token_hex(32)
