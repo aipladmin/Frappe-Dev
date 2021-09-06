@@ -46,5 +46,4 @@ def validate_otp():
 def logout():
     session.pop('emailid', None)
     session.pop('user_type', None)
-    session.clear()
     return redirect(url_for('auth.login'))
