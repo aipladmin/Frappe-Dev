@@ -24,9 +24,11 @@ def get_otp():
     if data['user_type'] == "librarian":
         session['user_type'] = "librarian"
         print(session['user_type'], session['emailid'])
+        session.permanent = True
         return render_template('auth/otp.html')
     if data['user_type'] == "user":
         session['user_type'] = "user"
+        session.permanent = True
         return redirect(url_for('user.user_index'))
 
 
