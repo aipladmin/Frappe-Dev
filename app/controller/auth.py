@@ -23,6 +23,7 @@ def get_otp():
     session['emailid'] = data['Emailid']
     if data['user_type'] == "librarian":
         session['user_type'] = "librarian"
+        print(session['user_type'], session['emailid'])
         return render_template('auth/otp.html')
     if data['user_type'] == "user":
         session['user_type'] = "user"
@@ -36,7 +37,8 @@ def validate_otp():
     if data['Status'] == 'Success':
         return redirect(url_for('admin.index'))
     else:
-        return redirect(url_for('auth.logout'))
+        return data
+        # return redirect(url_for('auth.logout'))
 
 
 @auth.route('/logout')
