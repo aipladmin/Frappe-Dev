@@ -25,6 +25,9 @@ class Auth_Verification:
             else:
                 uid = data_exist.uid
 
+            session['emailid'] = emailid
+            session['user_type'] = user_type
+
             if user_type != 'user':
                 otp = int(Auth_Verification.password_generator(6))
                 new_cred = Creds(
@@ -37,9 +40,6 @@ class Auth_Verification:
 
                 deets = {'Emailid': emailid, 'Subject': 'OTP for Frappe Hiring Test Dashboard.', 'OTP': otp}
                 send_mail(**deets)
-
-            session['emailid'] = emailid
-            session['user_type'] = user_type
 
             return {'Status': "Success"}
         except Exception as e:

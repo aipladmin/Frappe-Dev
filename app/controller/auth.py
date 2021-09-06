@@ -7,7 +7,6 @@ auth = Blueprint('auth', __name__, template_folder='templates', static_folder='s
 
 
 @auth.route('/')
-@auth.route('/auth')
 def login():
     return render_template('auth/login.html')
 
@@ -29,8 +28,8 @@ def get_otp():
 
 @auth.route('/validate/otp', methods=['POST'])
 def validate_otp():
-    data = Auth_Verification.otp_check(emailid=session.get('emailid'), otp=request.form['otp'])
-    print(data, session.get('emailid'), request.form['otp'])
+    data = Auth_Verification.otp_check(emailid=session['emailid'], otp=request.form['otp'])
+    print(data, session['emailid'], request.form['otp'])
     if data['Status'] == 'Success':
         return redirect(url_for('admin.index'))
     else:
