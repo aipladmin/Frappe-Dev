@@ -48,6 +48,7 @@ class Auth_Verification:
     def otp_check(emailid, otp):
         try:
             data = db.session.query(Users, Creds).join(Creds).filter(Users.email == emailid, Creds.otp == otp).one_or_none()
+            print(data)
             if not data.Creds:
                 return {'Status': "Invalid OTP"}
             else:
