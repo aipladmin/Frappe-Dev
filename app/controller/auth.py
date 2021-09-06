@@ -14,22 +14,25 @@ def login():
 @auth.route('/otp', methods=['POST'])
 def get_otp():
     if 'librarian' in request.form:
-        data = Auth_Verification.user_check(request.form['email'], user_type='librarian')
+        data = Auth_Verification.user_check(emailid=request.form['email'], user_type='librarian')
     elif 'user' in request.form:
-        data = Auth_Verification.user_check(request.form['email'], user_type='user')
+        data = Auth_Verification.user_check(emailid=request.form['email'], user_type='user')
 
-    if data['Status'] == 'Success' and session['user_type'] == "librarian":
-        return render_template('auth/otp.html')
-    elif data['Status'] == 'Success' and session['user_type'] == "user":
-        return redirect(url_for('user.user_index'))
-    else:
+    if data['Status'] != 'Success':
         return "INVALID"
+    session['emailid'] = data['Emailid']
+    if data['user_type'] == "librarian":
+        session['user_type'] = "librarian"
+        return render_template('auth/otp.html')
+    if data['user_type'] == "user":
+        session['user_type'] = "user"
+        return redirect(url_for('user.user_index'))
 
 
 @auth.route('/validate/otp', methods=['POST'])
 def validate_otp():
-    data = Auth_Verification.otp_check(emailid=session['emailid'], otp=request.form['otp'])
-    print(data, session['emailid'], request.form['otp'])
+    data = Auth_Verification.otp_check(otp=request.form['otp'])
+    print(data, session['emailid'], request.form['otp'], session['user_type'])
     if data['Status'] == 'Success':
         return redirect(url_for('admin.index'))
     else:

@@ -25,9 +25,6 @@ class Auth_Verification:
             else:
                 uid = data_exist.uid
 
-            session['emailid'] = emailid
-            session['user_type'] = user_type
-
             if user_type != 'user':
                 otp = int(Auth_Verification.password_generator(6))
                 new_cred = Creds(
@@ -41,13 +38,13 @@ class Auth_Verification:
                 deets = {'Emailid': emailid, 'Subject': 'OTP for Frappe Hiring Test Dashboard.', 'OTP': otp}
                 send_mail(**deets)
 
-            return {'Status': "Success"}
+            return {'Status': "Success", "Emailid": emailid, 'user_type': user_type}
         except Exception as e:
             return {'Status': "Error - " + str(e)}
 
-    def otp_check(emailid, otp):
+    def otp_check(otp):
         try:
-            data = db.session.query(Users, Creds).join(Creds).filter(Users.email == emailid, Creds.otp == otp).one_or_none()
+            data = db.session.query(Users, Creds).join(Creds).filter(Users.email == session['emailid'], Creds.otp == otp).one_or_none()
             print(data)
             if not data.Creds:
                 return {'Status': "Invalid OTP"}
