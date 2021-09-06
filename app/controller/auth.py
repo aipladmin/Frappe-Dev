@@ -1,4 +1,5 @@
 from flask import render_template, Blueprint, request, session, redirect, url_for
+from flask.helpers import flash
 from .auth_controller import Auth_Verification
 
 auth = Blueprint('auth', __name__, template_folder='templates', static_folder='static',
@@ -33,7 +34,7 @@ def validate_otp():
     if data['Status'] == 'Success':
         return redirect(url_for('admin.index'))
     else:
-        return "OTP Invalid"
+        return redirect(url_for('admin.logout'))
 
 
 @auth.route('/logout')
