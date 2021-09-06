@@ -32,8 +32,9 @@ def get_otp():
 
 @auth.route('/validate/otp', methods=['POST'])
 def validate_otp():
+    print("****"*50+str(session['emailid']))
     data = Auth_Verification.otp_check(otp=request.form['otp'])
-    print(data, session['emailid'], request.form['otp'], session['user_type'])
+    print(data, request.form['otp'], session['user_type'])
     if data['Status'] == 'Success':
         return redirect(url_for('admin.index'))
     else:
