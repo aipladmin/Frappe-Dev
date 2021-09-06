@@ -113,16 +113,16 @@ def api_caller(nof_books, nof_requests, params):
             api_data = r.json()
             d.extend(api_data['message'])
 
-        UD = {'message': d}
-        iterData = int(len(UD['message']))
-        if int(iterData) > int(nof_books):
-            iterData = nof_books
-        my_data = Books(**UD)
-        my_data.BooksInsert(iterData=iterData)
+        merged_data = {'message': d}
+        iter_data = int(len(merged_data['message']))
+        if int(iter_data) > int(nof_books):
+            iter_data = nof_books
+        my_data = Books(**merged_data)
+        my_data.BooksInsert(iterData=iter_data)
     except requests.exceptions.Timeout as e:
         return "Connection timed out."+"\n"+str(e)
     except requests.exceptions.RequestException as e:
-        raise str("System Down Please try againlater")+"\n"+str(e)
+        raise str("System Experiencing Unexpected Problem. Please Try Again Later")+"\n"+str(e)
     except Exception as e:
         return str(e)
 
