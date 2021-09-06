@@ -20,6 +20,7 @@ def get_otp():
 
     if data['Status'] != 'Success':
         return "INVALID"
+    print("OTP:            "+str(data))
     session['emailid'] = data['Emailid']
     if data['user_type'] == "librarian":
         session['user_type'] = "librarian"
