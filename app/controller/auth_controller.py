@@ -35,7 +35,7 @@ class Auth_Verification:
                 db.session.add(new_cred)
                 db.session.commit()
 
-                deets = {'Emailid': emailid, 'Subject': 'OTP', 'OTP': otp}
+                deets = {'Emailid': emailid, 'Subject': 'OTP for Frappe Hiring Test Dashboard.', 'OTP': otp}
                 send_mail(**deets)
 
             session['emailid'] = emailid
