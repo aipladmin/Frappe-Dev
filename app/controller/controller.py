@@ -10,7 +10,7 @@ from app import mysql
 # if platform.system().lower() == "windows":
 #     WKHTML_CONFIG = pdfkit.configuration(wkhtmltopdf='C:\\Program Files\\wkhtmltopdf\\bin\\wkhtmltopdf.exe')
 
-logging.basicConfig(level=logging.WARNING)
+logging.basicConfig(level=logging.ERROR)
 
 
 def mysql_query(sql):
