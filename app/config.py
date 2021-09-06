@@ -10,7 +10,7 @@ class Config(object):
 
     FLASK_ENV = 'development'
     secret_key = secrets.token_hex(32)
-    SECRET_KEY = secret_key
+    SECRET_KEY = "CF1F79742E5DB423F112CDB927E9B6A1F"
     PERMANENT_SESSION_LIFETIME = timedelta(minutes=30)
     DatabaseConfig = {
                     'MYSQL_DATABASE_USER': 'MyCommDB',
