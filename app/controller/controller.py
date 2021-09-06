@@ -52,7 +52,6 @@ def login_required(f):
 
 # MAIL DRIVER
 def send_mail(**deets):
-    # try:
     mail = Mail()
     msg = Message(deets['Subject'],
                   recipients=[deets['Emailid']])
