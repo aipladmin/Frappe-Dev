@@ -20,11 +20,10 @@ def get_otp():
 
     if data['Status'] != 'Success':
         return "INVALID"
-    print("OTP:            "+str(data))
+
     session['emailid'] = data['Emailid']
     if data['user_type'] == "librarian":
         session['user_type'] = "librarian"
-        print(session['user_type'], session['emailid'])
         session.permanent = True
         return render_template('auth/otp.html')
     if data['user_type'] == "user":
@@ -35,14 +34,11 @@ def get_otp():
 
 @auth.route('/validate/otp', methods=['POST'])
 def validate_otp():
-    print("****"*50+str(session['emailid']))
     data = Auth_Verification.otp_check(otp=request.form['otp'])
-    print(data, request.form['otp'], session['user_type'])
     if data['Status'] == 'Success':
         return redirect(url_for('admin.index'))
     else:
         return data
-        # return redirect(url_for('auth.logout'))
 
 
 @auth.route('/logout')
