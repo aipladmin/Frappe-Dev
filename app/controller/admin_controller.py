@@ -103,26 +103,33 @@ class InventoryManager:
 def api_caller(nof_books, nof_requests, params):
     try:
         nobCeil = math.ceil(nof_requests)
-        d = []
+        data_list = []
         for x in range(1, int(nobCeil)+1):
             params['page'] = int(x)
             params.pop('nob', None)
-            r = requests.get("https://frappe.io/api/method/frappe-library", params=params)
-            if r.status_code != 200:
-                return "API Error: " + r.status_code+"\n"+r.text
-            api_data = r.json()
-            d.extend(api_data['message'])
+            response = requests.get("https://frappe.io/api/method/frappe-library", params=params)
 
-        merged_data = {'message': d}
+            if response.status_code != 200:
+                return "API Error: " + response.status_code+"\n"+response.text
+            api_data = response.json()
+            data_list.extend(api_data['message'])
+
+        merged_data = {'message': data_list}
         iter_data = int(len(merged_data['message']))
+
         if int(iter_data) > int(nof_books):
             iter_data = nof_books
-        my_data = Books(**merged_data)
-        my_data.BooksInsert(iterData=iter_data)
+
+        book_import = Books(**merged_data)
+        book_import.BooksInsert(iterData=iter_data)
+        return iter_data
+
     except requests.exceptions.Timeout as e:
         return "Connection timed out."+"\n"+str(e)
+
     except requests.exceptions.RequestException as e:
         raise str("System Experiencing Unexpected Problem. Please Try Again Later")+"\n"+str(e)
+
     except Exception as e:
         return str(e)
 
