@@ -1,6 +1,10 @@
 # Frappe-Dev
 https://libfrappe.herokuapp.com/
 
+## For easy browsing
+https://github.dev/madhavparikh99/Frappe-Dev
+
+
 ## Prerequisite
 - [Python 3.7+](https://www.python.org/downloads/)
 - [PIP 20.0+](https://bootstrap.pypa.io/get-pip.py)
