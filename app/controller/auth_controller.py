@@ -44,11 +44,13 @@ class Auth_Verification:
 
     def otp_check(otp):
         try:
-            data = db.session.query(Users, Creds).join(Creds).filter(Users.email == session['emailid'], Creds.otp == otp).one_or_none()
+            data = db.session.query(Users, Creds).join(Creds).filter(Users.email == session['emailid'],Creds.otp == otp).one_or_none()
             print(data)
-            if not data.Creds:
+            if not data:
                 return {'Status': "Invalid OTP"}
             else:
                 return {'Status': "Success"}
+        except AttributeError:
+            return {'Status': "Invalid OTP"}
         except Exception as e:
             return {'Status': "Error - " + str(e)}
