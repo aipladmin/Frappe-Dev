@@ -14,11 +14,6 @@ admin = Blueprint('admin', __name__, template_folder='templates', static_folder=
                   static_url_path='/controller/static', url_prefix='/admin')
 
 
-# @admin.before_request
-# def before_request():
-#     session.pop('email', '')
-#     # session.clear()
-
 @admin.route('/')
 @admin.route('/index')
 @login_required
@@ -77,7 +72,7 @@ def books_to_inv():
     nof_books = request.form['nob']
     nof_requests = int(request.form['nob'])/20
     params = request.form.to_dict(flat=False)
-    api_caller(nof_books=nof_books, nof_requests=nof_requests, params=params)
+    merged_data = api_caller(nof_books=nof_books, nof_requests=nof_requests, params=params)
     flash('Books Inserted Successfully', 'success')
     return redirect(url_for('admin.books'))
 
