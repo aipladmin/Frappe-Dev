@@ -18,6 +18,7 @@ def get_otp():
     elif 'user' in request.form:
         data = Auth_Verification.user_check(emailid=request.form['email'], user_type='user')
 
+    print(data)
     if data['Status'] != 'Success':
         return "INVALID"
 
@@ -32,13 +33,15 @@ def get_otp():
         return redirect(url_for('user.user_index'))
 
 
-@auth.route('/validate/otp', methods=['POST'])
+@auth.route('/validate/otp', methods=['GET', 'POST'])
 def validate_otp():
-    data = Auth_Verification.otp_check(otp=request.form['otp'])
-    if data['Status'] == 'Success':
-        return redirect(url_for('admin.index'))
-    else:
-        return data
+    if request.method == "POST":
+        data = Auth_Verification.otp_check(otp=request.form['otp'])
+        if data['Status'] == 'Success':
+            return redirect(url_for('admin.index'))
+        flash('Invalid OTP', 'danger')
+        return redirect(url_for('auth.validate_otp'))
+    return render_template('auth/otp.html')
 
 
 @auth.route('/logout')

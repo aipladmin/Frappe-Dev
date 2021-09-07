@@ -1,0 +1,68 @@
+CREATE DATABASE  IF NOT EXISTS `lms` /*!40100 DEFAULT CHARACTER SET utf8mb4 COLLATE utf8mb4_0900_ai_ci */ /*!80016 DEFAULT ENCRYPTION='N' */;
+USE `lms`;
+-- MySQL dump 10.13  Distrib 8.0.25, for Win64 (x86_64)
+--
+-- Host: database-1.ceo7csjfbddw.ap-south-1.rds.amazonaws.com    Database: lms
+-- ------------------------------------------------------
+-- Server version	8.0.23
+
+/*!40101 SET @OLD_CHARACTER_SET_CLIENT=@@CHARACTER_SET_CLIENT */;
+/*!40101 SET @OLD_CHARACTER_SET_RESULTS=@@CHARACTER_SET_RESULTS */;
+/*!40101 SET @OLD_COLLATION_CONNECTION=@@COLLATION_CONNECTION */;
+/*!50503 SET NAMES utf8 */;
+/*!40103 SET @OLD_TIME_ZONE=@@TIME_ZONE */;
+/*!40103 SET TIME_ZONE='+00:00' */;
+/*!40014 SET @OLD_UNIQUE_CHECKS=@@UNIQUE_CHECKS, UNIQUE_CHECKS=0 */;
+/*!40014 SET @OLD_FOREIGN_KEY_CHECKS=@@FOREIGN_KEY_CHECKS, FOREIGN_KEY_CHECKS=0 */;
+/*!40101 SET @OLD_SQL_MODE=@@SQL_MODE, SQL_MODE='NO_AUTO_VALUE_ON_ZERO' */;
+/*!40111 SET @OLD_SQL_NOTES=@@SQL_NOTES, SQL_NOTES=0 */;
+SET @MYSQLDUMP_TEMP_LOG_BIN = @@SESSION.SQL_LOG_BIN;
+SET @@SESSION.SQL_LOG_BIN= 0;
+
+--
+-- GTID state at the beginning of the backup 
+--
+
+SET @@GLOBAL.GTID_PURGED=/*!80000 '+'*/ '';
+
+--
+-- Table structure for table `returns`
+--
+
+DROP TABLE IF EXISTS `returns`;
+/*!40101 SET @saved_cs_client     = @@character_set_client */;
+/*!50503 SET character_set_client = utf8mb4 */;
+CREATE TABLE `returns` (
+  `RID` int NOT NULL AUTO_INCREMENT,
+  `SID` int NOT NULL,
+  `TID` int NOT NULL,
+  `Timestamp` timestamp NOT NULL,
+  PRIMARY KEY (`RID`),
+  KEY `INDEX` (`SID`,`TID`),
+  KEY `transaction_idx` (`TID`),
+  CONSTRAINT `settings` FOREIGN KEY (`SID`) REFERENCES `settings` (`SID`),
+  CONSTRAINT `transaction` FOREIGN KEY (`TID`) REFERENCES `transactions` (`TID`)
+) ENGINE=InnoDB AUTO_INCREMENT=13 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
+/*!40101 SET character_set_client = @saved_cs_client */;
+
+--
+-- Dumping data for table `returns`
+--
+
+LOCK TABLES `returns` WRITE;
+/*!40000 ALTER TABLE `returns` DISABLE KEYS */;
+INSERT INTO `returns` VALUES (5,7,5,'2021-08-19 14:11:03'),(6,7,6,'2021-08-24 13:38:02'),(7,8,10,'2021-09-06 10:30:01'),(8,8,9,'2021-09-06 10:30:05'),(9,8,13,'2021-09-06 10:30:07'),(10,8,7,'2021-09-06 10:30:09'),(11,8,8,'2021-09-06 10:30:11'),(12,8,11,'2021-09-06 10:30:12');
+/*!40000 ALTER TABLE `returns` ENABLE KEYS */;
+UNLOCK TABLES;
+SET @@SESSION.SQL_LOG_BIN = @MYSQLDUMP_TEMP_LOG_BIN;
+/*!40103 SET TIME_ZONE=@OLD_TIME_ZONE */;
+
+/*!40101 SET SQL_MODE=@OLD_SQL_MODE */;
+/*!40014 SET FOREIGN_KEY_CHECKS=@OLD_FOREIGN_KEY_CHECKS */;
+/*!40014 SET UNIQUE_CHECKS=@OLD_UNIQUE_CHECKS */;
+/*!40101 SET CHARACTER_SET_CLIENT=@OLD_CHARACTER_SET_CLIENT */;
+/*!40101 SET CHARACTER_SET_RESULTS=@OLD_CHARACTER_SET_RESULTS */;
+/*!40101 SET COLLATION_CONNECTION=@OLD_COLLATION_CONNECTION */;
+/*!40111 SET SQL_NOTES=@OLD_SQL_NOTES */;
+
+-- Dump completed on 2021-09-07 20:12:40
