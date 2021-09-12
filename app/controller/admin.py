@@ -6,7 +6,7 @@ import matplotlib.pyplot as plt
 from flask import (Blueprint, flash, jsonify, redirect, session,
                    render_template, request, url_for)
 
-from .admin_controller import InventoryManager, Transactions, api_caller
+from .admin_controller import InventoryManager, Transactions, api_caller, Books, Message
 from .controller import mysql_query, login_required
 from .models import db, Settings
 
@@ -72,8 +72,9 @@ def books_to_inv():
     nof_books = request.form['nob']
     nof_requests = int(request.form['nob'])/20
     params = request.form.to_dict(flat=False)
-    merged_data = api_caller(nof_books=nof_books, nof_requests=nof_requests, params=params)
-    flash('Books Inserted Successfully', 'success')
+    books_imported = api_caller(nof_books=nof_books, nof_requests=nof_requests, params=params)
+    flash('Books Imported Successfully.', 'success')
+    flash('No of Books Imported:{} '.format(books_imported), 'warning')
     return redirect(url_for('admin.books'))
 
 
