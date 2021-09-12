@@ -73,8 +73,8 @@ def books_to_inv():
     nof_requests = int(request.form['nob'])/20
     params = request.form.to_dict(flat=False)
     books_imported = api_caller(nof_books=nof_books, nof_requests=nof_requests, params=params)
-    flash('Books Inserted Successfully.{} No of Books Imported:{} '.format("\n", books_imported), 'success')
-    flash('Books Inserted Successfully.{} No of Books Imported:{} '.format("\n", books_imported), 'warning')
+    flash('Books Imported Successfully.', 'success')
+    flash('No of Books Imported:{} '.format(books_imported), 'warning')
     return redirect(url_for('admin.books'))
 
 
