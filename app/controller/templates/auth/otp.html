@@ -55,7 +55,7 @@
                                     <form class="user" method="post" action="{{ url_for('auth.validate_otp') }}">
                                         <div class="form-group">
                                             <input type="password" class="form-control form-control-user"
-                                                id="exampleInputPassword" placeholder="Enter OTP" name="otp">
+                                                id="exampleInputPassword" placeholder="Enter OTP" name="otp" required>
                                             <small id="passwordHelpBlock" class="form-text text-danger">
                                                 Check the email-ID entered for the OTP.
                                             </small>
